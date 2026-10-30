@@ -416,6 +416,28 @@ async function loadPrayerTimes() {
       box.appendChild(row);
     });
 
+    const quickGrid = $("prayerQuickTimes");
+    if (quickGrid) {
+      const quickItems = [
+        ["Fajr", "ফজর", "🌅"],
+        ["Dhuhr", "জোহর", "☀️"],
+        ["Asr", "আসর", "🌤️"],
+        ["Maghrib", "মাগরিব", "🌙"],
+        ["Isha", "এশা", "🌌"]
+      ];
+      quickGrid.replaceChildren();
+      quickItems.forEach(([key, label, symbol]) => {
+        const item = makeNode("div", undefined, "prayer-quick-item");
+        item.appendChild(makeNode("span", symbol, "prayer-symbol"));
+        item.appendChild(makeNode("b", label));
+        item.appendChild(makeNode("strong", bnNumber(formatTime(timings[key]))));
+        quickGrid.appendChild(item);
+      });
+    }
+    setMessage("prayerQuickCity", city + " এলাকার সময়সূচি");
+    const quickButton = $("prayerQuickBtn");
+    if (quickButton) quickButton.textContent = "সময়সূচি হালনাগাদ হয়েছে ✓";
+
     box.appendChild(makeNode(
       "p",
       "সময়সূচি স্থানীয় মসজিদ বা ইসলামিক কর্তৃপক্ষের সঙ্গে মিলিয়ে নিন।",
@@ -1193,6 +1215,11 @@ function setupZakat() {
 
 function setupEvents() {
   $("prayerBtn")?.addEventListener("click", loadPrayerTimes);
+  $("prayerQuickBtn")?.addEventListener("click", () => {
+    const city = $("prayerCity");
+    if (city) city.scrollIntoView({ behavior: "smooth", block: "center" });
+    loadPrayerTimes();
+  });
 
   $("quranBtn")?.addEventListener("click", loadSurah);
   $("playSurahBtn")?.addEventListener("click", playSurah);

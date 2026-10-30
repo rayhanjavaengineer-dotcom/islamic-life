@@ -20,50 +20,62 @@
   <header class="topbar">
     <a class="brand" href="#home" aria-label="প্রচ্ছদ">
       <span class="brand-icon">☪</span>
-      <span><strong>আমি মুসলিম</strong><small>Islamic Life</small></span>
+      <span><strong>আমি মুসলিম</strong><small>ISLAMIC LIFE</small></span>
     </a>
-    <button id="darkModeBtn" class="icon-btn" type="button" aria-label="থিম পরিবর্তন">◐</button>
+    <div class="topbar-actions">
+      <a class="header-link" href="#prayer" aria-label="নামাজের সময়">◷</a>
+      <a class="header-link" href="#hijri" aria-label="ইসলামিক ক্যালেন্ডার">☾</a>
+      <button id="darkModeBtn" class="icon-btn" type="button" aria-label="থিম পরিবর্তন">◐</button>
+    </div>
   </header>
 
   <main class="container">
-    <section id="home" class="hero">
-      <div class="hero-content">
+    <section id="home" class="home-dashboard">
+      <div class="welcome-line">
         <span class="eyebrow">আসসালামু আলাইকুম</span>
-        <h1>ইসলামকে জানুন,<br>জীবনে আমল করুন</h1>
-        <p>প্রয়োজনীয় ইসলামিক তথ্য ও ইবাদতের সহায়তা—এক জায়গায়।</p>
-        <div class="hero-actions">
-          <a class="primary-btn" href="#prayer">নামাজের সময়</a>
-          <a class="secondary-btn" href="#quran">কুরআন পড়ুন</a>
-        </div>
+        <h1>ইসলামকে জানুন, জীবনে আমল করুন</h1>
+        <p>আপনার দৈনন্দিন ইবাদতের বিশ্বস্ত সহায়ক</p>
       </div>
-      <div class="hero-moon" aria-hidden="true">☪</div>
-    </section>
 
-    <section class="date-strip">
-      <div><span>আজকের তারিখ</span><strong id="todayDate">তারিখ লোড হচ্ছে…</strong></div>
-      <div><span>হিজরি তারিখ</span><strong id="hijriQuick">তথ্য দেখতে চাপ দিন</strong></div>
-      <button id="hijriBtn" class="small-btn" type="button">দেখুন</button>
-    </section>
+      <div class="daily-card">
+        <div class="date-heading">
+          <div><span class="date-label">আজকের তারিখ</span><strong id="todayDate">তারিখ লোড হচ্ছে…</strong></div>
+          <button id="hijriBtn" class="hijri-chip" type="button">🌙 <span id="hijriQuick">হিজরি তারিখ</span></button>
+        </div>
+        <div class="location-line">⌖ <span id="prayerQuickCity">Dhaka এলাকার সময়সূচি</span></div>
+        <div id="prayerQuickTimes" class="prayer-quick-grid" aria-live="polite">
+          <div class="prayer-quick-item"><span class="prayer-symbol">🌅</span><b>ফজর</b><strong>--:--</strong></div>
+          <div class="prayer-quick-item"><span class="prayer-symbol">☀️</span><b>জোহর</b><strong>--:--</strong></div>
+          <div class="prayer-quick-item"><span class="prayer-symbol">🌤️</span><b>আসর</b><strong>--:--</strong></div>
+          <div class="prayer-quick-item"><span class="prayer-symbol">🌙</span><b>মাগরিব</b><strong>--:--</strong></div>
+          <div class="prayer-quick-item"><span class="prayer-symbol">🌌</span><b>এশা</b><strong>--:--</strong></div>
+        </div>
+        <button id="prayerQuickBtn" class="quick-load-btn" type="button">নামাজের সময় দেখুন <span>›</span></button>
+      </div>
 
-    <section class="section-block">
-      <div class="section-heading">
-        <div><span class="eyebrow">আপনার দৈনন্দিন আমল</span><h2>প্রয়োজনীয় বিভাগ</h2></div>
+      <div class="menu-heading">
+        <div><span class="eyebrow">আপনার দৈনন্দিন আমল</span><h2>ইসলামিক সেবাসমূহ</h2></div>
+        <span class="menu-heading-mark">✦</span>
       </div>
       <div class="feature-grid">
-        <a class="feature-card" href="#prayer"><span>🕌</span><strong>নামাজ</strong><small>ওয়াক্ত ও নিয়ত</small></a>
-        <a class="feature-card" href="#quran"><span>📖</span><strong>আল-কুরআন</strong><small>সূরা ও অনুবাদ</small></a>
-        <a class="feature-card" href="#duas"><span>🤲</span><strong>দোয়া</strong><small>দৈনন্দিন দোয়া</small></a>
-        <a class="feature-card" href="#tasbih"><span>📿</span><strong>তাসবিহ</strong><small>ডিজিটাল কাউন্টার</small></a>
-        <a class="feature-card" href="#amal"><span>✅</span><strong>দৈনিক আমল</strong><small>নিজের অগ্রগতি</small></a>
-        <a class="feature-card" href="#qibla"><span>🧭</span><strong>কিবলা</strong><small>দিক নির্ণয়</small></a>
-        <a class="feature-card" href="#hadith"><span>📚</span><strong>হাদিস</strong><small>শিক্ষণীয় বাণী</small></a>
-        <a class="feature-card" href="#zakat"><span>💚</span><strong>যাকাত</strong><small>হিসাবের সহায়তা</small></a>
+        <a class="feature-card" href="#prayer"><span>◷</span><strong>নামাজের সময়সূচি</strong><small>পাঁচ ওয়াক্তের সময়</small></a>
+        <a class="feature-card" href="#niyat"><span>🧎</span><strong>নামাজের নিয়ত ও রাকাত</strong><small>নামাজের নিয়ম ও নির্দেশনা</small></a>
+        <a class="feature-card" href="#quran"><span>📖</span><strong>পবিত্র কুরআন</strong><small>সূরা, বাংলা অনুবাদ ও অডিও</small></a>
+        <a class="feature-card" href="#duas"><span>🤲</span><strong>দৈনন্দিন দোয়া</strong><small>আরবি, উচ্চারণ ও অর্থ</small></a>
+        <a class="feature-card" href="#hadith"><span>📚</span><strong>হাদিস ও শিক্ষা</strong><small>শিক্ষণীয় বাণী ও উৎস</small></a>
+        <a class="feature-card" href="#hijri"><span>🌙</span><strong>হিজরি ক্যালেন্ডার</strong><small>আজকের ইসলামিক তারিখ</small></a>
+        <a class="feature-card" href="#ramadan"><span>🌜</span><strong>রমজানের সময়সূচি</strong><small>সেহরি ও ইফতারের সময়</small></a>
+        <a class="feature-card" href="#qibla"><span>🧭</span><strong>কিবলার দিক</strong><small>কম্পাস দিয়ে দিক নির্ণয়</small></a>
+        <a class="feature-card" href="#tasbih"><span>📿</span><strong>ডিজিটাল তাসবিহ</strong><small>যিকির গণনা ও সংরক্ষণ</small></a>
+        <a class="feature-card" href="#amal"><span>☑</span><strong>দৈনিক আমল</strong><small>নিজের আমলের অগ্রগতি</small></a>
+        <a class="feature-card" href="#zakat"><span>💚</span><strong>যাকাত হিসাব</strong><small>প্রাথমিক হিসাবের সহায়তা</small></a>
+        <a class="feature-card" href="#creatorBtn"><span>✦</span><strong>অ্যাপ নির্মাতা</strong><small>অ্যাপ সম্পর্কে জানুন</small></a>
       </div>
     </section>
 
     <section id="prayer" class="section-block panel">
       <div class="section-heading"><div><span class="eyebrow">SALAH</span><h2>পাঁচ ওয়াক্ত নামাজ</h2></div><span class="section-icon">🕌</span></div>
-      <p class="muted">শহরের নাম ইংরেজিতে লিখে নামাজের সময় দেখুন। সময় গণনার পদ্ধতিভেদে সামান্য পার্থক্য হতে পারে।</p>
+      <p class="muted">আপনার শহরের নাম ইংরেজিতে লিখে পাঁচ ওয়াক্তের সময়সূচি হালনাগাদ করুন। গণনার পদ্ধতিভেদে সামান্য পার্থক্য হতে পারে।</p>
       <div class="inline-form">
         <input id="prayerCity" type="text" value="Dhaka" placeholder="শহরের নাম (যেমন Dhaka)" aria-label="শহরের নাম">
         <button id="prayerBtn" class="primary-btn" type="button">সময় দেখুন</button>

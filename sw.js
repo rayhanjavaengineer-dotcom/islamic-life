@@ -1,7 +1,7 @@
 
 "use strict";
 
-const CACHE_NAME = "islamic-life-v1";
+const CACHE_NAME = "islamic-life-v2";
 
 const APP_FILES = [
   "./",
