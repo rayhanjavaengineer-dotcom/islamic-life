@@ -9,14 +9,20 @@ const APP_FILES = [
   "./style.css",
   "./app.js",
   "./manifest.json",
-  "./creator.jpg"
+  "./creator.jpg",
+  "./icon-192.png",
+  "./icon-512.png"
 ];
 
 // অ্যাপ ইনস্টল করার সময় প্রয়োজনীয় ফাইল ক্যাশ করা
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(APP_FILES))
+      .then(async cache => {
+        const required = APP_FILES.filter(file => !file.includes("creator.jpg") && !file.includes("icon-"));
+        await cache.addAll(required);
+        await Promise.all(APP_FILES.filter(file => file.includes("creator.jpg") || file.includes("icon-")).map(file => cache.add(file).catch(() => null)));
+      })
       .then(() => self.skipWaiting())
   );
 });

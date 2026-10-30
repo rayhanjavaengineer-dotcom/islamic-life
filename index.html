@@ -14,73 +14,66 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Islamic Life">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
 </head>
 <body>
   <header class="topbar">
     <a class="brand" href="#home" aria-label="প্রচ্ছদ">
       <span class="brand-icon">☪</span>
-      <span><strong>আমি মুসলিম</strong><small>ISLAMIC LIFE</small></span>
+      <span><strong>আমি মুসলিম</strong><small>Islamic Life</small></span>
     </a>
-    <div class="topbar-actions">
-      <a class="header-link" href="#prayer" aria-label="নামাজের সময়">◷</a>
-      <a class="header-link" href="#hijri" aria-label="ইসলামিক ক্যালেন্ডার">☾</a>
-      <button id="darkModeBtn" class="icon-btn" type="button" aria-label="থিম পরিবর্তন">◐</button>
-    </div>
+    <div class="top-actions"><select id="languageSelect" aria-label="Language"><option value="bn">বাংলা</option><option value="en">English</option><option value="ar">العربية</option></select><button id="darkModeBtn" class="icon-btn" type="button" aria-label="থিম পরিবর্তন">◐</button></div>
   </header>
 
   <main class="container">
-    <section id="home" class="home-dashboard">
-      <div class="welcome-line">
+    <section id="home" class="hero">
+      <div class="hero-content">
         <span class="eyebrow">আসসালামু আলাইকুম</span>
-        <h1>ইসলামকে জানুন, জীবনে আমল করুন</h1>
-        <p>আপনার দৈনন্দিন ইবাদতের বিশ্বস্ত সহায়ক</p>
-      </div>
-
-      <div class="daily-card">
-        <div class="date-heading">
-          <div><span class="date-label">আজকের তারিখ</span><strong id="todayDate">তারিখ লোড হচ্ছে…</strong></div>
-          <button id="hijriBtn" class="hijri-chip" type="button">🌙 <span id="hijriQuick">হিজরি তারিখ</span></button>
+        <h1>ইসলামকে জানুন,<br>জীবনে আমল করুন</h1>
+        <p>প্রয়োজনীয় ইসলামিক তথ্য ও ইবাদতের সহায়তা—এক জায়গায়।</p>
+        <div class="hero-actions">
+          <a class="primary-btn" href="#prayer">নামাজের সময়</a>
+          <a class="secondary-btn" href="#quran">কুরআন পড়ুন</a>
         </div>
-        <div class="location-line">⌖ <span id="prayerQuickCity">Dhaka এলাকার সময়সূচি</span></div>
-        <div id="prayerQuickTimes" class="prayer-quick-grid" aria-live="polite">
-          <div class="prayer-quick-item"><span class="prayer-symbol">🌅</span><b>ফজর</b><strong>--:--</strong></div>
-          <div class="prayer-quick-item"><span class="prayer-symbol">☀️</span><b>জোহর</b><strong>--:--</strong></div>
-          <div class="prayer-quick-item"><span class="prayer-symbol">🌤️</span><b>আসর</b><strong>--:--</strong></div>
-          <div class="prayer-quick-item"><span class="prayer-symbol">🌙</span><b>মাগরিব</b><strong>--:--</strong></div>
-          <div class="prayer-quick-item"><span class="prayer-symbol">🌌</span><b>এশা</b><strong>--:--</strong></div>
-        </div>
-        <button id="prayerQuickBtn" class="quick-load-btn" type="button">নামাজের সময় দেখুন <span>›</span></button>
       </div>
+      <div class="hero-moon" aria-hidden="true">☪</div>
+      <div class="hero-meta"><span id="nextPrayerName">পরবর্তী নামাজ</span><strong id="nextPrayerCountdown">সময় লোড হচ্ছে…</strong></div>
+    </section>
 
-      <div class="menu-heading">
-        <div><span class="eyebrow">আপনার দৈনন্দিন আমল</span><h2>ইসলামিক সেবাসমূহ</h2></div>
-        <span class="menu-heading-mark">✦</span>
+    <section class="date-strip">
+      <div><span>আজকের তারিখ</span><strong id="todayDate">তারিখ লোড হচ্ছে…</strong></div>
+      <div><span>হিজরি তারিখ</span><strong id="hijriQuick">তথ্য দেখতে চাপ দিন</strong></div>
+      <button id="hijriBtn" class="small-btn" type="button">দেখুন</button>
+    </section>
+
+    <section class="section-block">
+      <div class="section-heading">
+        <div><span class="eyebrow">আপনার দৈনন্দিন আমল</span><h2>প্রয়োজনীয় বিভাগ</h2></div>
       </div>
       <div class="feature-grid">
-        <a class="feature-card" href="#prayer"><span>◷</span><strong>নামাজের সময়সূচি</strong><small>পাঁচ ওয়াক্তের সময়</small></a>
-        <a class="feature-card" href="#niyat"><span>🧎</span><strong>নামাজের নিয়ত ও রাকাত</strong><small>নামাজের নিয়ম ও নির্দেশনা</small></a>
-        <a class="feature-card" href="#quran"><span>📖</span><strong>পবিত্র কুরআন</strong><small>সূরা, বাংলা অনুবাদ ও অডিও</small></a>
-        <a class="feature-card" href="#duas"><span>🤲</span><strong>দৈনন্দিন দোয়া</strong><small>আরবি, উচ্চারণ ও অর্থ</small></a>
-        <a class="feature-card" href="#hadith"><span>📚</span><strong>হাদিস ও শিক্ষা</strong><small>শিক্ষণীয় বাণী ও উৎস</small></a>
-        <a class="feature-card" href="#hijri"><span>🌙</span><strong>হিজরি ক্যালেন্ডার</strong><small>আজকের ইসলামিক তারিখ</small></a>
-        <a class="feature-card" href="#ramadan"><span>🌜</span><strong>রমজানের সময়সূচি</strong><small>সেহরি ও ইফতারের সময়</small></a>
-        <a class="feature-card" href="#qibla"><span>🧭</span><strong>কিবলার দিক</strong><small>কম্পাস দিয়ে দিক নির্ণয়</small></a>
-        <a class="feature-card" href="#tasbih"><span>📿</span><strong>ডিজিটাল তাসবিহ</strong><small>যিকির গণনা ও সংরক্ষণ</small></a>
-        <a class="feature-card" href="#amal"><span>☑</span><strong>দৈনিক আমল</strong><small>নিজের আমলের অগ্রগতি</small></a>
-        <a class="feature-card" href="#zakat"><span>💚</span><strong>যাকাত হিসাব</strong><small>প্রাথমিক হিসাবের সহায়তা</small></a>
-        <a class="feature-card" href="#creatorBtn"><span>✦</span><strong>অ্যাপ নির্মাতা</strong><small>অ্যাপ সম্পর্কে জানুন</small></a>
+        <a class="feature-card" href="#prayer"><span>🕌</span><strong>নামাজ</strong><small>ওয়াক্ত ও নিয়ত</small></a>
+        <a class="feature-card" href="#quran"><span>📖</span><strong>আল-কুরআন</strong><small>সূরা ও অনুবাদ</small></a>
+        <a class="feature-card" href="#duas"><span>🤲</span><strong>দোয়া</strong><small>দৈনন্দিন দোয়া</small></a>
+        <a class="feature-card" href="#tasbih"><span>📿</span><strong>তাসবিহ</strong><small>ডিজিটাল কাউন্টার</small></a>
+        <a class="feature-card" href="#amal"><span>✅</span><strong>দৈনিক আমল</strong><small>নিজের অগ্রগতি</small></a>
+        <a class="feature-card" href="#qibla"><span>🧭</span><strong>কিবলা</strong><small>দিক নির্ণয়</small></a>
+        <a class="feature-card" href="#hadith"><span>📚</span><strong>হাদিস</strong><small>শিক্ষণীয় বাণী</small></a>
+        <a class="feature-card" href="#zakat"><span>💚</span><strong>যাকাত</strong><small>হিসাবের সহায়তা</small></a>
       </div>
     </section>
 
     <section id="prayer" class="section-block panel">
       <div class="section-heading"><div><span class="eyebrow">SALAH</span><h2>পাঁচ ওয়াক্ত নামাজ</h2></div><span class="section-icon">🕌</span></div>
-      <p class="muted">আপনার শহরের নাম ইংরেজিতে লিখে পাঁচ ওয়াক্তের সময়সূচি হালনাগাদ করুন। গণনার পদ্ধতিভেদে সামান্য পার্থক্য হতে পারে।</p>
+      <p class="muted">শহরের নাম ইংরেজিতে লিখে নামাজের সময় দেখুন। সময় গণনার পদ্ধতিভেদে সামান্য পার্থক্য হতে পারে।</p>
       <div class="inline-form">
         <input id="prayerCity" type="text" value="Dhaka" placeholder="শহরের নাম (যেমন Dhaka)" aria-label="শহরের নাম">
         <button id="prayerBtn" class="primary-btn" type="button">সময় দেখুন</button>
       </div>
-      <div id="prayerInfo" class="result-box" aria-live="polite">নামাজের সময় দেখতে উপরের বাটনে চাপ দিন।</div>
+      <div id="prayerInfo" class="result-box" aria-live="polite">নামাজের সময় লোড হচ্ছে…</div>
+      <div id="prayerCards" class="prayer-cards" aria-live="polite"></div>
+      <div class="button-row"><button id="azanNotifyBtn" class="secondary-btn" type="button">🔔 আযান নোটিফিকেশন চালু</button><button id="refreshPrayerBtn" class="secondary-btn" type="button">↻ সময় আপডেট</button></div>
+      <p class="note">নোটিফিকেশন কেবল অনুমোদিত ও খোলা অ্যাপ/ব্রাউজারের উপযোগী পরিবেশে কাজ করতে পারে; বন্ধ থাকা অবস্থায় নির্ভরযোগ্য ব্যাকগ্রাউন্ড আযান নিশ্চিত নয়।</p>
     </section>
 
     <section id="niyat" class="section-block panel">
@@ -161,6 +154,7 @@
         </div>
       </div>
       <div id="qiblaDegree" class="result-box" aria-live="polite">কিবলার দিক দেখতে বাটনে চাপ দিন।</div>
+      <p class="note">কম্পাস সেন্সর সমর্থিত ও অনুমতিপ্রাপ্ত ফোনে ডিভাইস ঘোরালে কম্পাস আপডেট হবে। ফোনের কম্পাস ক্যালিব্রেট করে নিন।</p>
     </section>
 
     <section id="tasbih" class="section-block panel">
@@ -198,6 +192,58 @@
       <p class="note">এটি প্রাথমিক হিসাবের সহায়তা মাত্র। নিসাব, সম্পদের ধরন ও যাকাতের শর্ত সম্পর্কে নির্ভরযোগ্য আলেমের পরামর্শ নিন।</p>
     </section>
 
+
+    <section id="advanced" class="section-block panel">
+      <div class="section-heading"><div><span class="eyebrow">YOUR ISLAMIC LIFE</span><h2>আপনার ব্যক্তিগত ড্যাশবোর্ড</h2></div><span class="section-icon">✨</span></div>
+      <div class="profile-grid">
+        <label>আপনার নাম<input id="profileName" type="text" maxlength="40" placeholder="নাম লিখুন"></label>
+        <label>আপনার শহর<input id="profileCity" type="text" maxlength="60" value="Dhaka" placeholder="City"></label>
+      </div>
+      <button id="saveProfileBtn" class="primary-btn" type="button">প্রোফাইল সংরক্ষণ</button>
+      <p id="profileMessage" class="muted" aria-live="polite">তথ্য শুধু এই ডিভাইসে সংরক্ষিত থাকবে।</p>
+      <h3>দৈনিক অগ্রগতি</h3><div id="dailySummary" class="result-box">আজকের আমলের অগ্রগতি এখানে দেখা যাবে।</div>
+    </section>
+
+    <section id="fitra" class="section-block panel">
+      <div class="section-heading"><div><span class="eyebrow">FITRA CALCULATOR</span><h2>ফিতরা হিসাবের সহায়তা</h2></div><span class="section-icon">🌾</span></div>
+      <label for="fitraPeople">পরিবারের সদস্য সংখ্যা</label><input id="fitraPeople" type="number" min="1" step="1" value="1">
+      <label for="fitraRate">প্রতি ব্যক্তির ফিতরার হার (টাকা; স্থানীয় কর্তৃপক্ষের ঘোষিত হার লিখুন)</label><input id="fitraRate" type="number" min="0" step="any" placeholder="স্থানীয় ঘোষিত হার">
+      <button id="fitraBtn" class="primary-btn" type="button">মোট হিসাব করুন</button><div id="fitraInfo" class="result-box" aria-live="polite">স্থানীয়ভাবে ঘোষিত হার বসিয়ে হিসাব করুন।</div>
+      <p class="note">ফিতরার পরিমাণ খাদ্যদ্রব্য, অঞ্চল ও ফিকহি মতভেদে ভিন্ন হতে পারে। এখানে কোনো নির্দিষ্ট হার নির্ধারণ করা হয়নি।</p>
+    </section>
+
+    <section id="quiz" class="section-block panel">
+      <div class="section-heading"><div><span class="eyebrow">LEARN & TEST</span><h2>ইসলামিক কুইজ</h2></div><span class="section-icon">🧠</span></div>
+      <div id="quizQuestion" class="result-box">কুইজ শুরু করতে নিচের বাটনে চাপ দিন।</div><div id="quizOptions" class="quiz-options"></div>
+      <div class="button-row"><button id="quizStartBtn" class="primary-btn" type="button">কুইজ শুরু</button><button id="quizNextBtn" class="secondary-btn" type="button" disabled>পরের প্রশ্ন</button></div><p id="quizFeedback" class="muted" aria-live="polite"></p>
+      <p class="note">কুইজে কেবল সাধারণ, যাচাইযোগ্য মৌলিক তথ্য রাখা হয়েছে; জটিল ফিকহি প্রশ্ন নয়।</p>
+    </section>
+
+    <section id="mosques" class="section-block panel">
+      <div class="section-heading"><div><span class="eyebrow">NEARBY MOSQUES</span><h2>আশেপাশের মসজিদ</h2></div><span class="section-icon">🕌</span></div>
+      <p class="muted">Google Maps-এ আপনার বর্তমান অবস্থানের আশেপাশের মসজিদ খুঁজুন।</p><button id="mosqueBtn" class="primary-btn" type="button">মসজিদ খুঁজুন</button>
+    </section>
+
+    <section id="audioLibrary" class="section-block panel">
+      <div class="section-heading"><div><span class="eyebrow">AUDIO LIBRARY</span><h2>কুরআন অডিও লাইব্রেরি</h2></div><span class="section-icon">🎧</span></div>
+      <label for="audioSurahSelect">সূরা নির্বাচন করুন</label><select id="audioSurahSelect"><option value="1">সূরা আল-ফাতিহা</option></select>
+      <button id="audioLibraryPlay" class="primary-btn" type="button">অডিও চালান</button><audio id="libraryAudio" controls preload="none"></audio><p id="audioLibraryStatus" class="muted" aria-live="polite">অনলাইন অডিও চালাতে ইন্টারনেট প্রয়োজন।</p>
+    </section>
+
+    <section id="shareCard" class="section-block panel">
+      <div class="section-heading"><div><span class="eyebrow">SHARE GOODNESS</span><h2>ইসলামিক কার্ড শেয়ার</h2></div><span class="section-icon">💌</span></div>
+      <div id="shareableIslamicCard" class="share-card"><span>☪</span><h3>জ্ঞান অর্জন করুন, যাচাই করুন, আমল করুন।</h3><p>আমি মুসলিম | Islamic Life</p></div>
+      <button id="shareCardBtn" class="primary-btn" type="button">কার্ড শেয়ার / কপি</button>
+    </section>
+
+    <section id="stories" class="section-block panel">
+      <div class="section-heading"><div><span class="eyebrow">ISLAMIC KNOWLEDGE</span><h2>নবী ও সাহাবিদের জীবনী</h2></div><span class="section-icon">📚</span></div>
+      <p>নবী-রাসুল ও সাহাবিদের জীবন সম্পর্কে নির্ভরযোগ্য বই, কুরআন ও হাদিসভিত্তিক জ্ঞান অর্জন করুন।</p>
+      <a class="secondary-btn inline-link" href="https://quran.com/" target="_blank" rel="noopener">কুরআনের আয়াত পড়ুন ↗</a>
+      <a class="secondary-btn inline-link" href="https://sunnah.com/" target="_blank" rel="noopener">হাদিসের উৎস দেখুন ↗</a>
+      <p class="note">এখানে পূর্ণ জীবনীগ্রন্থ যোগ করার আগে সম্পাদিত ও নির্ভরযোগ্য বাংলা/ইংরেজি উৎস সংযুক্ত করতে হবে।</p>
+    </section>
+
     <section class="section-block creator-section">
       <button id="creatorBtn" class="creator-btn" type="button">👤 অ্যাপ নির্মাতা</button>
       <p class="muted">অ্যাপ সম্পর্কে তথ্য ও নির্মাতার পরিচয় দেখতে চাপ দিন।</p>
@@ -210,6 +256,7 @@
     <a href="#quran"><span>📖</span><small>কুরআন</small></a>
     <a href="#duas"><span>🤲</span><small>দোয়া</small></a>
     <a href="#tasbih"><span>📿</span><small>তাসবিহ</small></a>
+    <a href="#advanced"><span>👤</span><small>প্রোফাইল</small></a>
   </nav>
 
   <div id="creatorModal" class="modal" aria-hidden="true">

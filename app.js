@@ -416,28 +416,6 @@ async function loadPrayerTimes() {
       box.appendChild(row);
     });
 
-    const quickGrid = $("prayerQuickTimes");
-    if (quickGrid) {
-      const quickItems = [
-        ["Fajr", "ফজর", "🌅"],
-        ["Dhuhr", "জোহর", "☀️"],
-        ["Asr", "আসর", "🌤️"],
-        ["Maghrib", "মাগরিব", "🌙"],
-        ["Isha", "এশা", "🌌"]
-      ];
-      quickGrid.replaceChildren();
-      quickItems.forEach(([key, label, symbol]) => {
-        const item = makeNode("div", undefined, "prayer-quick-item");
-        item.appendChild(makeNode("span", symbol, "prayer-symbol"));
-        item.appendChild(makeNode("b", label));
-        item.appendChild(makeNode("strong", bnNumber(formatTime(timings[key]))));
-        quickGrid.appendChild(item);
-      });
-    }
-    setMessage("prayerQuickCity", city + " এলাকার সময়সূচি");
-    const quickButton = $("prayerQuickBtn");
-    if (quickButton) quickButton.textContent = "সময়সূচি হালনাগাদ হয়েছে ✓";
-
     box.appendChild(makeNode(
       "p",
       "সময়সূচি স্থানীয় মসজিদ বা ইসলামিক কর্তৃপক্ষের সঙ্গে মিলিয়ে নিন।",
@@ -1046,6 +1024,7 @@ function setupQibla() {
       position => {
         const { latitude, longitude } = position.coords;
         const degree = calculateQibla(latitude, longitude);
+        qiblaBearing = degree;
         const needle = $("compassNeedle");
 
         if (needle) {
@@ -1209,17 +1188,40 @@ function setupZakat() {
   });
 }
 
+
+/* ===== Premium upgrades ===== */
+const EXTRA_STORE={profile:'il-profile-v1',language:'il-language-v1',prayer:'il-prayer-v1'};
+let prayerSchedule=null, prayerTicker=null, deviceHeading=null, qiblaBearing=null, quizPosition=0, quizAnswered=false;
+const quizItems=[
+ {q:'পবিত্র কুরআনে মোট কয়টি সূরা আছে?',o:['১০৪','১১৪','১২৪','৯৯'],a:1,why:'কুরআনে ১১৪টি সূরা রয়েছে।'},
+ {q:'ইসলামের স্তম্ভ কয়টি?',o:['৩টি','৪টি','৫টি','৬টি'],a:2,why:'হাদিসে ইসলামের পাঁচটি স্তম্ভের কথা এসেছে।'},
+ {q:'কোন মাসে রোজা ফরজ?',o:['মুহাররম','রমজান','শাওয়াল','রজব'],a:1,why:'রমজান মাসে রোজা ফরজ।'},
+ {q:'কুরআন কোন ভাষায় নাজিল হয়েছে?',o:['আরবি','ফারসি','উর্দু','হিব্রু'],a:0,why:'কুরআন আরবি ভাষায় নাজিল হয়েছে।'}
+];
+function formatCountdown(ms){if(ms<=0)ms=0;const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;return `${bnNumber(String(h).padStart(2,'0'))}:${bnNumber(String(m).padStart(2,'0'))}:${bnNumber(String(sec).padStart(2,'0'))}`;}
+function parsePrayerDate(time){const clean=String(time||'').split(' ')[0];const [h,m]=clean.split(':').map(Number);if(!Number.isFinite(h)||!Number.isFinite(m))return null;const d=new Date();d.setHours(h,m,0,0);return d;}
+function updatePrayerCountdown(){if(!prayerSchedule)return;const keys=['Fajr','Dhuhr','Asr','Maghrib','Isha'];const names={Fajr:'ফজর',Dhuhr:'জোহর',Asr:'আসর',Maghrib:'মাগরিব',Isha:'এশা'};const now=new Date();let next=null;for(const key of keys){const d=parsePrayerDate(prayerSchedule[key]);if(d&&d>now){next={key,date:d};break;}}if(!next){const d=parsePrayerDate(prayerSchedule.Fajr);if(d){d.setDate(d.getDate()+1);next={key:'Fajr',date:d};}}if(next){setMessage('nextPrayerName','পরবর্তী নামাজ: '+names[next.key]);setMessage('nextPrayerCountdown',formatCountdown(next.date-now));}}
+function renderPrayerCards(timings){const host=$('prayerCards');if(!host)return;host.replaceChildren();const labels=[['Fajr','ফজর'],['Sunrise','সূর্যোদয়'],['Dhuhr','জোহর'],['Asr','আসর'],['Maghrib','মাগরিব'],['Isha','এশা']];const now=new Date();let active='';for(const [k] of labels){const t=parsePrayerDate(timings[k]);if(t&&t>now&&k!=='Sunrise'){active=k;break;}}labels.forEach(([key,label])=>{const card=makeNode('div',undefined,'prayer-time-card'+(key===active?' active':''));card.appendChild(makeNode('small',label));card.appendChild(makeNode('strong',formatTime(timings[key])));host.appendChild(card);});}
+async function loadPrayerAutomatically(){const city=$('profileCity')?.value?.trim()||$('prayerCity')?.value?.trim()||'Dhaka';if($('prayerCity'))$('prayerCity').value=city;await loadPrayerTimes();}
+const originalLoadPrayerTimes=loadPrayerTimes;
+loadPrayerTimes=async function(){await originalLoadPrayerTimes();const city=$('prayerCity')?.value.trim()||'Dhaka';try{const u='https://api.aladhan.com/v1/timingsByCity?city='+encodeURIComponent(city)+'&country=Bangladesh&method=1';const d=await getJSON(u);if(d.code===200&&d.data?.timings){prayerSchedule=d.data.timings;writeStore(EXTRA_STORE.prayer,{city,date:todayKey(),timings:prayerSchedule});renderPrayerCards(prayerSchedule);updatePrayerCountdown();if(prayerTicker)clearInterval(prayerTicker);prayerTicker=setInterval(updatePrayerCountdown,1000);}}catch(e){setMessage('nextPrayerCountdown','সময় পাওয়া যায়নি');}};
+function setupAzanNotification(){const btn=$('azanNotifyBtn');btn?.addEventListener('click',async()=>{if(!('Notification'in window)){setMessage('prayerInfo','এই ব্রাউজারে নোটিফিকেশন সমর্থিত নয়।');return;}const permission=await Notification.requestPermission();if(permission==='granted'){btn.textContent='✓ নোটিফিকেশন অনুমোদিত';setMessage('prayerInfo','নোটিফিকেশন অনুমোদিত হয়েছে। ওয়েবসাইট খোলা থাকলে সময়মতো স্মরণ করানো যাবে।');}else setMessage('prayerInfo','নোটিফিকেশন অনুমতি দেওয়া হয়নি। ব্রাউজার সেটিংস থেকে অনুমতি দিন।');});}
+function setupQiblaSensor(){const listen=()=>{if(!('DeviceOrientationEvent'in window))return;window.addEventListener('deviceorientation',e=>{let heading=null;if(typeof e.webkitCompassHeading==='number')heading=e.webkitCompassHeading;else if(typeof e.alpha==='number')heading=360-e.alpha;if(heading!==null&&qiblaBearing!==null){const needle=$('compassNeedle');if(needle)needle.style.transform=`rotate(${qiblaBearing-heading}deg)`;}} ,true);};const btn=$('qiblaBtn');btn?.addEventListener('click',async()=>{try{if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){const p=await DeviceOrientationEvent.requestPermission();if(p!=='granted')setMessage('qiblaDegree','কম্পাস সেন্সরের অনুমতি পাওয়া যায়নি।');else listen();}else listen();}catch{listen();}});}
+function setupProfile(){const saved=readStore(EXTRA_STORE.profile,{name:'',city:'Dhaka'});if($('profileName'))$('profileName').value=saved.name||'';if($('profileCity'))$('profileCity').value=saved.city||'Dhaka';$('saveProfileBtn')?.addEventListener('click',()=>{const data={name:$('profileName')?.value.trim()||'',city:$('profileCity')?.value.trim()||'Dhaka'};writeStore(EXTRA_STORE.profile,data);setMessage('profileMessage','প্রোফাইল সংরক্ষিত হয়েছে।');if($('prayerCity'))$('prayerCity').value=data.city;});renderDailySummary();}
+function renderDailySummary(){const done=amalChecks.filter(x=>x.checked).length;setMessage('dailySummary',`আজ ${bnNumber(done)} / ${bnNumber(amalChecks.length)}টি আমল সম্পন্ন হয়েছে (${bnNumber(amalChecks.length?Math.round(done/amalChecks.length*100):0)}%)।`);}
+function setupFitra(){ $('fitraBtn')?.addEventListener('click',()=>{const n=Number($('fitraPeople')?.value),rate=Number($('fitraRate')?.value);if(!Number.isInteger(n)||n<1||!Number.isFinite(rate)||rate<=0){setMessage('fitraInfo','সদস্য সংখ্যা ও স্থানীয় ঘোষিত হার সঠিকভাবে লিখুন।');return;}setMessage('fitraInfo',`মোট ফিতরা: ৳${(n*rate).toLocaleString('en-BD',{maximumFractionDigits:2})} (${bnNumber(n)} × ৳${rate.toLocaleString('en-BD')})। স্থানীয় আলেম/কর্তৃপক্ষের ঘোষিত হার যাচাই করুন।`);});}
+function setupQuiz(){const start=$('quizStartBtn'),next=$('quizNextBtn');function show(){const item=quizItems[quizPosition%quizItems.length];setMessage('quizQuestion',`প্রশ্ন ${bnNumber(quizPosition+1)}: ${item.q}`);const host=$('quizOptions');host.replaceChildren();item.o.forEach((opt,i)=>{const b=makeNode('button',opt,'quiz-option');b.type='button';b.addEventListener('click',()=>{if(quizAnswered)return;quizAnswered=true;Array.from(host.children).forEach((el,j)=>{el.disabled=true;if(j===item.a)el.classList.add('correct');else if(j===i)el.classList.add('wrong');});setMessage('quizFeedback',(i===item.a?'সঠিক উত্তর! ':'উত্তরটি সঠিক নয়। ')+item.why);next.disabled=false;});host.appendChild(b);});quizAnswered=false;next.disabled=true;setMessage('quizFeedback','একটি উত্তর নির্বাচন করুন।');}start?.addEventListener('click',()=>{quizPosition=0;show();});next?.addEventListener('click',()=>{quizPosition++;show();});}
+function setupMosqueFinder(){$('mosqueBtn')?.addEventListener('click',()=>{const city=$('profileCity')?.value.trim()||'near me';const url='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent('mosque near '+city);window.open(url,'_blank','noopener');});}
+function setupAudioLibrary(){const select=$('audioSurahSelect');const old=$('surahSelect');if(select&&old){select.innerHTML=old.innerHTML;}$('audioLibraryPlay')?.addEventListener('click',async()=>{const n=Number(select?.value||1),audio=$('libraryAudio');setMessage('audioLibraryStatus','অডিও লিংক লোড হচ্ছে…');try{const data=await getJSON(`https://api.alquran.cloud/v1/surah/${n}/ar.alafasy`);const url=data.data?.ayahs?.[0]?.audio;if(!url)throw new Error('Audio not found');audio.src=url;await audio.play();setMessage('audioLibraryStatus','নির্বাচিত সূরার প্রথম আয়াতের অডিও চলছে।');}catch{setMessage('audioLibraryStatus','অডিও পাওয়া যায়নি। ইন্টারনেট সংযোগ পরীক্ষা করুন।');}});}
+function setupShareCard(){$('shareCardBtn')?.addEventListener('click',async()=>{const text='☪ জ্ঞান অর্জন করুন, যাচাই করুন, আমল করুন।\nআমি মুসলিম | Islamic Life';try{if(navigator.share)await navigator.share({title:'Islamic Life',text,url:location.href});else{await copyText(text+'\n'+location.href);setMessage('audioTitle','শেয়ার টেক্সট কপি হয়েছে।');}}catch{}});}
+function setupLanguage(){const el=$('languageSelect');if(!el)return;const saved=readStore(EXTRA_STORE.language,'bn');el.value=saved;el.addEventListener('change',()=>{writeStore(EXTRA_STORE.language,el.value);const dict={bn:{title:'আমি মুসলিম | Islamic Life',greet:'আসসালামু আলাইকুম'},en:{title:'I Am Muslim | Islamic Life',greet:'Assalamu Alaikum'},ar:{title:'أنا مسلم | الحياة الإسلامية',greet:'السلام عليكم'}};document.title=dict[el.value].title;const eyebrow=document.querySelector('.hero .eyebrow');if(eyebrow)eyebrow.textContent=dict[el.value].greet;setMessage('profileMessage',el.value==='en'?'Language preference saved. Some religious content remains in its original language.':el.value==='ar'?'تم حفظ تفضيل اللغة. بعض المحتوى الديني يبقى بلغته الأصلية.':'ভাষার পছন্দ সংরক্ষিত হয়েছে। কিছু ধর্মীয় কনটেন্ট মূল ভাষায় থাকবে।');});}
+
 /* ==========================================
    সব ইভেন্ট ও অ্যাপ চালু
    ========================================== */
 
 function setupEvents() {
   $("prayerBtn")?.addEventListener("click", loadPrayerTimes);
-  $("prayerQuickBtn")?.addEventListener("click", () => {
-    const city = $("prayerCity");
-    if (city) city.scrollIntoView({ behavior: "smooth", block: "center" });
-    loadPrayerTimes();
-  });
 
   $("quranBtn")?.addEventListener("click", loadSurah);
   $("playSurahBtn")?.addEventListener("click", playSurah);
@@ -1233,6 +1235,7 @@ function setupEvents() {
   $("hijriBtnFull")?.addEventListener("click", loadHijri);
 
   $("ramadanBtn")?.addEventListener("click", loadRamadanCalendar);
+  $("refreshPrayerBtn")?.addEventListener("click", loadPrayerTimes);
 }
 
 function initApp() {
@@ -1245,6 +1248,15 @@ function initApp() {
   setupZakat();
   setupQibla();
   setupEvents();
+  setupAzanNotification();
+  setupQiblaSensor();
+  setupProfile();
+  setupFitra();
+  setupQuiz();
+  setupMosqueFinder();
+  setupAudioLibrary();
+  setupShareCard();
+  setupLanguage();
 
   renderDuas();
   renderBookmarks();

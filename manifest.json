@@ -1,4 +1,3 @@
-
 {
   "id": "./",
   "name": "আমি মুসলিম | Islamic Life",
@@ -29,6 +28,20 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "নামাজের সময়",
+      "url": "./index.html#prayer"
+    },
+    {
+      "name": "কুরআন",
+      "url": "./index.html#quran"
+    },
+    {
+      "name": "তাসবিহ",
+      "url": "./index.html#tasbih"
     }
   ]
 }
