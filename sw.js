@@ -1,1 +1,78 @@
-const CACHE="islamic-life-premium-v1",CORE=["./","./index.html","./style.css","./app.js","./manifest.json"];self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(a=>Promise.all(a.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));self.addEventListener("fetch",e=>{if(e.request.method!=="GET"||new URL(e.request.url).origin!==location.origin)return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(x=>{if(x.ok)caches.open(CACHE).then(c=>c.put(e.request,x.clone()));return x}).catch(()=>caches.match("./index.html"))))});self.addEventListener("push",e=>{let d={title:"আমি মুসলিম",body:"নতুন নোটিফিকেশন",url:"./"};try{d={...d,...e.data.json()}}catch{}e.waitUntil(self.registration.showNotification(d.title,{body:d.body,icon:"./icon-192.png",data:{url:d.url}}))});self.addEventListener("notificationclick",e=>{e.notification.close();e.waitUntil(clients.openWindow(e.notification.data?.url||"./"))});
+
+"use strict";
+
+const CACHE_NAME = "islamic-life-v1";
+
+const APP_FILES = [
+  "./",
+  "./index.html",
+  "./style.css",
+  "./app.js",
+  "./manifest.json",
+  "./creator.jpg"
+];
+
+// অ্যাপ ইনস্টল করার সময় প্রয়োজনীয় ফাইল ক্যাশ করা
+self.addEventListener("install", event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(APP_FILES))
+      .then(() => self.skipWaiting())
+  );
+});
+
+// পুরোনো ভার্সনের ক্যাশ সরানো
+self.addEventListener("activate", event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys
+          .filter(key => key !== CACHE_NAME)
+          .map(key => caches.delete(key))
+      )
+    ).then(() => self.clients.claim())
+  );
+});
+
+// একই অরিজিনের অ্যাপ ফাইল ক্যাশ থেকে দেখানো
+self.addEventListener("fetch", event => {
+  const request = event.request;
+
+  if (request.method !== "GET") return;
+
+  const url = new URL(request.url);
+
+  // বাহ্যিক API ও অডিওকে এই ক্যাশে সংরক্ষণ করা হবে না
+  if (url.origin !== self.location.origin) return;
+
+  event.respondWith(
+    caches.match(request).then(cachedResponse => {
+      if (cachedResponse) return cachedResponse;
+
+      return fetch(request).then(response => {
+        if (
+          response &&
+          response.ok &&
+          response.type === "basic"
+        ) {
+          const copy = response.clone();
+
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(request, copy);
+          });
+        }
+
+        return response;
+      }).catch(() => {
+        if (request.mode === "navigate") {
+          return caches.match("./index.html");
+        }
+
+        return new Response("ইন্টারনেট সংযোগ নেই।", {
+          status: 503,
+          statusText: "Offline"
+        });
+      });
+    })
+  );
+});

@@ -1,1210 +1,1246 @@
-
-(() => {
+// @ts-nocheck
 "use strict";
 
-/* =====================================
-   IM MUSLIM — ISLAMIC LIFE
-   Main Application JavaScript
-===================================== */
+/* ==========================================
+   আমি মুসলিম | Islamic Life
+   সম্পূর্ণ সংশোধিত app.js
+   ========================================== */
 
-const $ = (s, root = document) => root.querySelector(s);
-const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+const $ = (id) => document.getElementById(id);
 
 const STORE = {
-  theme: "il-theme",
-  language: "im-muslim-language",
-  profile: "il-profile-v1",
-  bookmarks: "im-muslim-bookmarks",
+  theme: "im-muslim-theme",
   tasbih: "im-muslim-tasbih",
-  prayer: "il-last-prayer-times"
+  bookmarks: "im-muslim-bookmarks",
+  amal: "im-muslim-amal"
 };
 
-function get(key, fallback) {
+function readStore(key, fallback) {
   try {
-    const value = JSON.parse(localStorage.getItem(key));
-    return value ?? fallback;
+    const value = localStorage.getItem(key);
+    return value === null ? fallback : JSON.parse(value);
   } catch {
     return fallback;
   }
 }
 
-function set(key, value) {
+function writeStore(key, value) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
-  } catch (e) {
-    console.warn("Storage unavailable:", e);
+  } catch {
+    // স্টোরেজ কাজ না করলেও অ্যাপ চালু থাকবে।
   }
 }
 
-function text(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = value;
+function bnNumber(value) {
+  return String(value).replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[Number(d)]);
 }
 
-function html(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.innerHTML = value;
+function makeNode(tag, text, className) {
+  const node = document.createElement(tag);
+
+  if (text !== undefined && text !== null) {
+    node.textContent = text;
+  }
+
+  if (className) node.className = className;
+
+  return node;
 }
 
-function on(id, event, callback) {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener(event, callback);
-  return el;
+function setMessage(id, message) {
+  const el = $(id);
+  if (el) el.textContent = message;
 }
 
-function safeNumber(value) {
-  const n = Number(value);
-  return Number.isFinite(n) ? n : 0;
+async function getJSON(url) {
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error("সার্ভার থেকে তথ্য পাওয়া যায়নি।");
+  }
+
+  return response.json();
 }
 
-const screens = [
-  "home", "menu", "prayer", "quran", "duas",
-  "hadith", "history", "prophets", "companions",
-  "calendar", "ramadan", "qibla", "tasbih",
-  "amal", "zakat", "quiz", "mosques", "saved",
-  "profile"
-];
+function addButton(
+  parent,
+  label,
+  callback,
+  className = "secondary-btn"
+) {
+  const button = makeNode("button", label, className);
 
-let language = get(STORE.language, "bn");
-let currentScreen = "home";
+  button.type = "button";
+  button.addEventListener("click", callback);
+  parent.appendChild(button);
 
-/* =====================================
-   TRANSLATIONS
-===================================== */
+  return button;
+}
 
-const translations = {
-  "আসসালামু আলাইকুম": "Assalamu Alaikum",
-  "আপনার প্রতিদিনের": "Your Daily",
-  "ইসলামিক সঙ্গী": "Islamic Companion",
-  "পরবর্তী নামাজ": "Next Prayer",
-  "নামাজের সময়": "Prayer Times",
-  "নামাজের সময়": "Prayer Times",
-  "শহর অনুযায়ী সময় দেখুন": "View prayer times by city",
-  "সকল বিভাগ": "All Categories",
-  "হোম": "Home",
-  "মেনু": "Menu",
-  "কুরআন": "Quran",
-  "আল-কুরআন": "The Holy Quran",
-  "নামাজ ও আজান": "Prayer & Adhan",
-  "দোয়া ও জিকির": "Duas & Dhikr",
-  "হাদিস": "Hadith",
-  "ইসলামের ইতিহাস": "Islamic History",
-  "ইতিহাস": "History",
-  "নবী ও রাসুল": "Prophets & Messengers",
-  "নবী-রাসুল": "Prophets",
-  "সাহাবিগণ": "Companions",
-  "হিজরি ক্যালেন্ডার": "Hijri Calendar",
-  "রমজান": "Ramadan",
-  "কিবলা": "Qibla",
-  "কিবলা কম্পাস": "Qibla Compass",
-  "তাসবিহ": "Tasbih",
-  "দৈনিক আমল": "Daily Deeds",
-  "আমল": "Daily Deeds",
-  "যাকাত": "Zakat",
-  "যাকাত ক্যালকুলেটর": "Zakat Calculator",
-  "ইসলামিক কুইজ": "Islamic Quiz",
-  "কুইজ": "Quiz",
-  "মসজিদ খুঁজুন": "Find a Mosque",
-  "মসজিদ": "Mosques",
-  "সংরক্ষিত": "Saved",
-  "প্রোফাইল": "Profile",
-  "সময় দেখুন": "Show Times",
-  "সময়সূচি": "Schedule",
-  "শহর": "City",
-  "আজানের নোটিফিকেশন": "Adhan Notifications",
-  "ফজর": "Fajr",
-  "সূর্যোদয়": "Sunrise",
-  "যোহর": "Dhuhr",
-  "আসর": "Asr",
-  "মাগরিব": "Maghrib",
-  "এশা": "Isha",
-  "ঠিক সময়ে": "At prayer time",
-  "৫ মিনিট আগে": "5 minutes before",
-  "১০ মিনিট আগে": "10 minutes before",
-  "পছন্দ সংরক্ষণ": "Save Preferences",
-  "নোটিফিকেশন চালু করুন": "Enable Notifications",
-  "সূরা নির্বাচন": "Select Surah",
-  "পড়ুন": "Read",
-  "সূরা খুঁজুন": "Search Surah",
-  "তিলাওয়াত": "Recitation",
-  "শুনুন": "Listen",
-  "খুঁজুন": "Search",
-  "সব": "All",
-  "দৈনন্দিন": "Daily",
-  "সকাল-সন্ধ্যা": "Morning & Evening",
-  "আজকের হিজরি তারিখ": "Today's Hijri Date",
-  "কিবলার দিক নির্ণয়": "Find Qibla Direction",
-  "গণনা করুন": "Count",
-  "রিসেট": "Reset",
-  "পাঁচ ওয়াক্ত নামাজ": "Five Daily Prayers",
-  "কুরআন তিলাওয়াত": "Quran Recitation",
-  "সকাল-সন্ধ্যার জিকির": "Morning & Evening Dhikr",
-  "দরুদ পাঠ": "Send Blessings",
-  "সদকা / ভালো কাজ": "Charity / Good Deeds",
-  "সম্পদ": "Assets",
-  "ঋণ": "Debts",
-  "হিসাব করুন": "Calculate",
-  "শুরু করুন": "Start",
-  "শুরু": "Start",
-  "পরের প্রশ্ন": "Next Question",
-  "Google Maps-এ খুঁজুন": "Find on Google Maps",
-  "নাম": "Name",
-  "সংরক্ষণ": "Save",
-  "লগইন": "Log In",
-  "অ্যাকাউন্ট খুলুন": "Create Account",
-  "ইমেইল": "Email",
-  "পাসওয়ার্ড": "Password",
-  "নির্মাতা পরিচিতি": "About the Creator",
-  "নির্মাতা": "Creator",
-  "আরবি কপি": "Copy Arabic",
-  "বাংলা": "Bangla",
-  "ইংরেজি": "English",
-  "সূরা": "Surah",
-  "আয়াত": "Ayah",
-  "এখনও কিছু সংরক্ষিত নেই": "Nothing saved yet",
-  "এখনো কোনো আয়াত সংরক্ষণ করা হয়নি।": "No ayahs saved yet.",
-  "এই ডিভাইসে সংরক্ষিত হয়েছে।": "Saved on this device.",
-  "লোড হচ্ছে…": "Loading...",
-  "সময়সূচি পাওয়া যায়নি": "Schedule unavailable",
-  "তারিখ পাওয়া যায়নি": "Date unavailable",
-  "সূরা লোড হয়নি": "Could not load Surah",
-  "সঠিক!": "Correct!",
-  "সঠিক উত্তর:": "Correct answer:",
-  "অনুমতি দেওয়া হয়নি।": "Permission not granted.",
-  "অনুমতি দেওয়া হয়েছে": "Permission granted",
-  "আজ": "Today",
-  "সম্পন্ন": "Completed",
-  "Founder & Creator": "Founder & Creator",
-  "জ্ঞান, ইবাদত ও উপকারী প্রযুক্তির উদ্যোগ।":
-    "An initiative for knowledge, worship and useful technology."
-};
+function formatTime(time) {
+  if (!time) return "—";
 
-const reverseTranslations = Object.fromEntries(
-  Object.entries(translations).map(([bn, en]) => [en, bn])
-);
+  return String(time)
+    .replace(/\s*\([^)]*\)/g, "")
+    .trim();
+}
 
-const originalText = new WeakMap();
-const originalPlaceholders = new WeakMap();
+/* তারিখ ও ফুটার */
+function showToday() {
+  const now = new Date();
 
-function translatePage() {
-  const english = language === "en";
-  document.documentElement.lang = language;
-
-  const walker = document.createTreeWalker(
-    document.body,
-    NodeFilter.SHOW_TEXT
+  setMessage(
+    "todayDate",
+    new Intl.DateTimeFormat("bn-BD", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    }).format(now)
   );
 
-  const nodes = [];
-  while (walker.nextNode()) nodes.push(walker.currentNode);
-
-  nodes.forEach(node => {
-    if (!originalText.has(node)) {
-      originalText.set(node, node.textContent);
-    }
-
-    const original = originalText.get(node);
-    const trimmed = original.trim();
-
-    if (!trimmed) return;
-
-    const translated = english
-      ? translations[trimmed]
-      : reverseTranslations[trimmed];
-
-    if (translated) {
-      node.textContent = original.replace(trimmed, translated);
-    } else {
-      node.textContent = original;
-    }
-  });
-
-  $$("input, textarea").forEach(input => {
-    if (!originalPlaceholders.has(input)) {
-      originalPlaceholders.set(
-        input,
-        input.getAttribute("placeholder") || ""
-      );
-    }
-
-    const original = originalPlaceholders.get(input);
-    const translated = english
-      ? translations[original]
-      : reverseTranslations[original];
-
-    if (translated) input.placeholder = translated;
-    else input.placeholder = original;
-  });
+  setMessage("footerYear", now.getFullYear());
 }
 
-function t(bn, en) {
-  return language === "en" ? en : bn;
-}
-
-function setupLanguage() {
-  const select = $("#languageSelect");
-  if (!select) return;
-
-  select.value = language;
-
-  select.addEventListener("change", () => {
-    language = select.value === "en" ? "en" : "bn";
-    set(STORE.language, language);
-    translatePage();
-    renderDynamicContent();
-  });
-
-  translatePage();
-}
-
-/* =====================================
-   SCREEN NAVIGATION
-===================================== */
-
-function showScreen(name) {
-  if (!screens.includes(name)) name = "home";
-
-  currentScreen = name;
-
-  $$(".screen").forEach(screen => {
-    screen.classList.toggle(
-      "active",
-      screen.id === "screen-" + name
-    );
-  });
-
-  $$("nav [data-screen]").forEach(button => {
-    button.classList.toggle(
-      "active",
-      button.dataset.screen === name
-    );
-  });
-
-  window.scrollTo({ top: 0, behavior: "smooth" });
-
-  if (name === "saved") renderSaved();
-  if (name === "amal") renderAmal();
-}
-
-document.addEventListener("click", event => {
-  const button = event.target.closest("[data-screen]");
-  if (button) showScreen(button.dataset.screen);
-});
-
-/* =====================================
-   DARK MODE
-===================================== */
-
+/* ডার্ক মোড */
 function setupTheme() {
-  if (get(STORE.theme, false)) {
+  const button = $("darkModeBtn");
+  const theme = readStore(STORE.theme, "light");
+
+  if (theme === "dark") {
     document.body.classList.add("dark");
   }
 
-  on("darkModeBtn", "click", () => {
+  if (!button) return;
+
+  function updateButton() {
+    button.textContent =
+      document.body.classList.contains("dark") ? "☀" : "◐";
+  }
+
+  updateButton();
+
+  button.addEventListener("click", () => {
     document.body.classList.toggle("dark");
-    set(STORE.theme, document.body.classList.contains("dark"));
-  });
-}
 
-/* =====================================
-   DATE
-===================================== */
-
-function showToday() {
-  const locale = language === "en" ? "en-US" : "bn-BD";
-  text(
-    "todayDate",
-    new Intl.DateTimeFormat(locale, { dateStyle: "full" }).format(new Date())
-  );
-}
-
-/* =====================================
-   PROFILE
-===================================== */
-
-function setupProfile() {
-  const profile = get(STORE.profile, {
-    name: "",
-    city: "Dhaka"
-  });
-
-  if ($("#profileName")) $("#profileName").value = profile.name;
-  if ($("#profileCity")) $("#profileCity").value = profile.city;
-
-  on("saveProfileBtn", "click", () => {
-    set(STORE.profile, {
-      name: $("#profileName")?.value || "",
-      city: $("#profileCity")?.value || "Dhaka"
-    });
-
-    text(
-      "profileMessage",
-      t("এই ডিভাইসে সংরক্ষিত হয়েছে।", "Saved on this device.")
+    writeStore(
+      STORE.theme,
+      document.body.classList.contains("dark")
+        ? "dark"
+        : "light"
     );
+
+    updateButton();
+  });
+}
+
+/* অ্যাপ নির্মাতার পপআপ */
+function setupCreatorModal() {
+  const openButton = $("creatorBtn");
+  const closeButton = $("closeCreatorBtn");
+  const modal = $("creatorModal");
+
+  if (!openButton || !closeButton || !modal) return;
+
+  function openModal() {
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    closeButton.focus();
+  }
+
+  function closeModal() {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    openButton.focus();
+  }
+
+  openButton.addEventListener("click", openModal);
+  closeButton.addEventListener("click", closeModal);
+
+  modal.querySelectorAll("[data-close-creator]").forEach(element => {
+    element.addEventListener("click", closeModal);
   });
 
-  on("creatorBtn", "click", () => {
-    $("#creatorModal")?.classList.add("open");
-  });
-
-  on("closeCreatorBtn", "click", () => {
-    $("#creatorModal")?.classList.remove("open");
-  });
-
-  $("#creatorModal")?.addEventListener("click", e => {
-    if (e.target.id === "creatorModal") {
-      e.currentTarget.classList.remove("open");
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && modal.classList.contains("open")) {
+      closeModal();
     }
   });
 }
 
-/* =====================================
-   PRAYER TIMES
-===================================== */
+/* ==========================================
+   নামাজের নিয়ত
+   ========================================== */
 
-const prayerNames = {
-  Fajr: ["ফজর", "Fajr"],
-  Sunrise: ["সূর্যোদয়", "Sunrise"],
-  Dhuhr: ["যোহর", "Dhuhr"],
-  Asr: ["আসর", "Asr"],
-  Maghrib: ["মাগরিব", "Maghrib"],
-  Isha: ["এশা", "Isha"]
+/*
+  নিয়ত অন্তরের ইচ্ছা।
+  নিচের বাংলা উচ্চারণগুলো প্রচলিত সহায়ক উদাহরণ।
+  নির্দিষ্ট বাক্য মুখে বলা সর্বজনীন বাধ্যবাধকতা নয়।
+  স্থানীয় নির্ভরযোগ্য আলেমের কাছ থেকে উচ্চারণ যাচাই করুন।
+*/
+
+const niyatData = {
+  fajr: {
+    title: "ফজরের নামাজ",
+    rakats: "২ রাকাত সুন্নত, এরপর ২ রাকাত ফরজ",
+    items: [
+      {
+        title: "২ রাকাত সুন্নত",
+        pronunciation:
+          "নাওয়াইতু আন উসাল্লিয়া লিল্লাহি তাআলা রাকআতাই সালাতিল ফাজরি সুন্নাতা রাসূলিল্লাহি তাআলা মুতাওয়াজ্জিহান ইলা জিহাতিল কাবাতিশ শারীফাহ। আল্লাহু আকবার।",
+        meaning:
+          "আল্লাহ তাআলার সন্তুষ্টির জন্য ফজরের দুই রাকাত সুন্নত নামাজ আদায়ের ইচ্ছা করছি।"
+      },
+      {
+        title: "২ রাকাত ফরজ",
+        pronunciation:
+          "নাওয়াইতু আন উসাল্লিয়া লিল্লাহি তাআলা রাকআতাই সালাতিল ফাজরি ফারদাল্লাহি তাআলা মুতাওয়াজ্জিহান ইলা জিহাতিল কাবাতিশ শারীফাহ। আল্লাহু আকবার।",
+        meaning:
+          "আল্লাহ তাআলার সন্তুষ্টির জন্য ফজরের দুই রাকাত ফরজ নামাজ আদায়ের ইচ্ছা করছি।"
+      }
+    ]
+  },
+
+  zuhr: {
+    title: "জোহরের নামাজ",
+    rakats:
+      "৪ রাকাত সুন্নত, ৪ রাকাত ফরজ, ২ রাকাত সুন্নত; এরপর নফল পড়া যায়",
+    items: [
+      {
+        title: "৪ রাকাত সুন্নত",
+        pronunciation:
+          "নাওয়াইতু আন উসাল্লিয়া লিল্লাহি তাআলা আরবা রাকআতি সালাতিজ জুহরি সুন্নাতা রাসূলিল্লাহি তাআলা মুতাওয়াজ্জিহান ইলা জিহাতিল কাবাতিশ শারীফাহ। আল্লাহু আকবার।",
+        meaning:
+          "আল্লাহর সন্তুষ্টির জন্য জোহরের চার রাকাত সুন্নত নামাজ আদায়ের ইচ্ছা করছি।"
+      },
+      {
+        title: "৪ রাকাত ফরজ",
+        pronunciation:
+          "নাওয়াইতু আন উসাল্লিয়া লিল্লাহি তাআলা আরবা রাকআতি সালাতিজ জুহরি ফারদাল্লাহি তাআলা মুতাওয়াজ্জিহান ইলা জিহাতিল কাবাতিশ শারীফাহ। আল্লাহু আকবার।",
+        meaning:
+          "আল্লাহর সন্তুষ্টির জন্য জোহরের চার রাকাত ফরজ নামাজ আদায়ের ইচ্ছা করছি।"
+      },
+      {
+        title: "২ রাকাত সুন্নত",
+        pronunciation:
+          "নাওয়াইতু আন উসাল্লিয়া লিল্লাহি তাআলা রাকআতাই সালাতিজ জুহরি সুন্নাতা রাসূলিল্লাহি তাআলা মুতাওয়াজ্জিহান ইলা জিহাতিল কাবাতিশ শারীফাহ। আল্লাহু আকবার।",
+        meaning:
+          "আল্লাহর সন্তুষ্টির জন্য জোহরের দুই রাকাত সুন্নত নামাজ আদায়ের ইচ্ছা করছি।"
+      },
+      {
+        title: "নফল নামাজ",
+        pronunciation:
+          "নফল নামাজের জন্য অন্তরে আল্লাহর সন্তুষ্টির উদ্দেশ্য স্থির করুন।",
+        meaning:
+          "নফল নামাজ ঐচ্ছিক ইবাদত; রাকাত ও পদ্ধতি সম্পর্কে নির্ভরযোগ্য আলেমের পরামর্শ নিন।"
+      }
+    ]
+  },
+
+  asr: {
+    title: "আসরের নামাজ",
+    rakats:
+      "৪ রাকাত ফরজ; আগে ৪ রাকাত সুন্নতে গায়রে মুয়াক্কাদা পড়া যায়",
+    items: [
+      {
+        title: "৪ রাকাত সুন্নতে গায়রে মুয়াক্কাদা",
+        pronunciation:
+          "নাওয়াইতু আন উসাল্লিয়া লিল্লাহি তাআলা আরবা রাকআতি সালাতিল আসরি সুন্নাতান মুতাওয়াজ্জিহান ইলা জিহাতিল কাবাতিশ শারীফাহ। আল্লাহু আকবার।",
+        meaning:
+          "আল্লাহর সন্তুষ্টির জন্য আসরের আগে চার রাকাত সুন্নত নামাজ আদায়ের ইচ্ছা করছি।"
+      },
+      {
+        title: "৪ রাকাত ফরজ",
+        pronunciation:
+          "নাওয়াইতু আন উসাল্লিয়া লিল্লাহি তাআলা আরবা রাকআতি সালাতিল আসরি ফারদাল্লাহি তাআলা মুতাওয়াজ্জিহান ইলা জিহাতিল কাবাতিশ শারীফাহ। আল্লাহু আকবার।",
+        meaning:
+          "আল্লাহর সন্তুষ্টির জন্য আসরের চার রাকাত ফরজ নামাজ আদায়ের ইচ্ছা করছি।"
+      }
+    ]
+  },
+
+  maghrib: {
+    title: "মাগরিবের নামাজ",
+    rakats:
+      "৩ রাকাত ফরজ, এরপর ২ রাকাত সুন্নত; নফলও পড়া যায়",
+    items: [
+      {
+        title: "৩ রাকাত ফরজ",
+        pronunciation:
+          "নাওয়াইতু আন উসাল্লিয়া লিল্লাহি তাআলা সালাসা রাকআতি সালাতিল মাগরিবি ফারদাল্লাহি তাআলা মুতাওয়াজ্জিহান ইলা জিহাতিল কাবাতিশ শারীফাহ। আল্লাহু আকবার।",
+        meaning:
+          "আল্লাহর সন্তুষ্টির জন্য মাগরিবের তিন রাকাত ফরজ নামাজ আদায়ের ইচ্ছা করছি।"
+      },
+      {
+        title: "২ রাকাত সুন্নত",
+        pronunciation:
+          "নাওয়াইতু আন উসাল্লিয়া লিল্লাহি তাআলা রাকআতাই সালাতিল মাগরিবি সুন্নাতা রাসূলিল্লাহি তাআলা মুতাওয়াজ্জিহান ইলা জিহাতিল কাবাতিশ শারীফাহ। আল্লাহু আকবার।",
+        meaning:
+          "আল্লাহর সন্তুষ্টির জন্য মাগরিবের দুই রাকাত সুন্নত নামাজ আদায়ের ইচ্ছা করছি।"
+      },
+      {
+        title: "নফল নামাজ",
+        pronunciation:
+          "নফল নামাজের জন্য অন্তরে আল্লাহর সন্তুষ্টির উদ্দেশ্য স্থির করুন।",
+        meaning:
+          "ইচ্ছা করলে নফল নামাজ পড়া যায়।"
+      }
+    ]
+  },
+
+  isha: {
+    title: "এশার নামাজ",
+    rakats:
+      "৪ রাকাত ফরজ, ২ রাকাত সুন্নত এবং বিতরসহ অন্যান্য নামাজ",
+    items: [
+      {
+        title: "৪ রাকাত সুন্নত",
+        pronunciation:
+          "নাওয়াইতু আন উসাল্লিয়া লিল্লাহি তাআলা আরবা রাকআতি সালাতিল ইশাই সুন্নাতান মুতাওয়াজ্জিহান ইলা জিহাতিল কাবাতিশ শারীফাহ। আল্লাহু আকবার।",
+        meaning:
+          "এশার ফরজের আগে চার রাকাত সুন্নত নামাজ আদায়ের ইচ্ছা করছি।"
+      },
+      {
+        title: "৪ রাকাত ফরজ",
+        pronunciation:
+          "নাওয়াইতু আন উসাল্লিয়া লিল্লাহি তাআলা আরবা রাকআতি সালাতিল ইশাই ফারদাল্লাহি তাআলা মুতাওয়াজ্জিহান ইলা জিহাতিল কাবাতিশ শারীফাহ। আল্লাহু আকবার।",
+        meaning:
+          "আল্লাহর সন্তুষ্টির জন্য এশার চার রাকাত ফরজ নামাজ আদায়ের ইচ্ছা করছি।"
+      },
+      {
+        title: "২ রাকাত সুন্নত",
+        pronunciation:
+          "নাওয়াইতু আন উসাল্লিয়া লিল্লাহি তাআলা রাকআতাই সালাতিল ইশাই সুন্নাতা রাসূলিল্লাহি তাআলা মুতাওয়াজ্জিহান ইলা জিহাতিল কাবাতিশ শারীফাহ। আল্লাহু আকবার।",
+        meaning:
+          "আল্লাহর সন্তুষ্টির জন্য এশার দুই রাকাত সুন্নত নামাজ আদায়ের ইচ্ছা করছি।"
+      },
+      {
+        title: "৩ রাকাত বিতর",
+        pronunciation:
+          "নাওয়াইতু আন উসাল্লিয়া লিল্লাহি তাআলা সালাসা রাকআতি সালাতিল বিতরি ওয়াজিবাল্লাহি তাআলা মুতাওয়াজ্জিহান ইলা জিহাতিল কাবাতিশ শারীফাহ। আল্লাহু আকবার।",
+        meaning:
+          "হানাফি মাজহাব অনুসারে আল্লাহর সন্তুষ্টির জন্য তিন রাকাত বিতর নামাজ আদায়ের ইচ্ছা করছি। অন্য মাজহাবে বিতরের বিধান ভিন্ন হতে পারে।"
+      }
+    ]
+  }
 };
 
-let timings = {};
+function renderNiyat(key = "fajr") {
+  const box = $("niyatInfo");
+  if (!box) return;
 
-function prayerName(key) {
-  return prayerNames[key]
-    ? prayerNames[key][language === "en" ? 1 : 0]
-    : key;
+  const data = niyatData[key] || niyatData.fajr;
+  box.replaceChildren();
+
+  box.appendChild(makeNode("h3", data.title));
+  box.appendChild(makeNode("p", data.rakats, "muted"));
+  box.appendChild(makeNode(
+    "p",
+    "মনে রাখুন: নিয়ত মূলত অন্তরের ইচ্ছা। বাংলা উচ্চারণ শেখার সহায়ক মাত্র।",
+    "translation"
+  ));
+
+  data.items.forEach(item => {
+    const card = makeNode("article", undefined, "content-card");
+    card.appendChild(makeNode("h4", item.title));
+    card.appendChild(makeNode("h4", "প্রচলিত বাংলা উচ্চারণ"));
+    card.appendChild(makeNode("p", item.pronunciation));
+    card.appendChild(makeNode("h4", "সহজ অর্থ"));
+    card.appendChild(makeNode("p", item.meaning));
+    box.appendChild(card);
+  });
 }
 
+function setupNiyat() {
+  document.querySelectorAll("[data-prayer-tab]").forEach(button => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll("[data-prayer-tab]").forEach(tab => {
+        tab.classList.toggle("active", tab === button);
+      });
+
+      renderNiyat(button.dataset.prayerTab);
+    });
+  });
+
+  renderNiyat();
+}
+
+/* ==========================================
+   নামাজের সময়
+   ========================================== */
+
 async function loadPrayerTimes() {
-  const city = $("#prayerCity")?.value.trim() || "Dhaka";
-  text("prayerInfo", t("লোড হচ্ছে…", "Loading..."));
+  const city = $("prayerCity")?.value.trim() || "Dhaka";
+  const box = $("prayerInfo");
+  if (!box) return;
+
+  box.textContent = "নামাজের সময় লোড হচ্ছে…";
 
   try {
     const url =
-      `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=Bangladesh&method=1`;
+      "https://api.aladhan.com/v1/timingsByCity?city=" +
+      encodeURIComponent(city) +
+      "&country=Bangladesh&method=1";
 
-    const response = await fetch(url);
-    const data = await response.json();
+    const data = await getJSON(url);
 
-    if (data.code !== 200) throw new Error("Prayer API error");
+    if (data.code !== 200 || !data.data?.timings) {
+      throw new Error("সময় পাওয়া যায়নি।");
+    }
 
-    timings = data.data.timings;
+    const timings = data.data.timings;
+    const labels = [
+      ["Fajr", "ফজর"],
+      ["Sunrise", "সূর্যোদয়"],
+      ["Dhuhr", "জোহর"],
+      ["Asr", "আসর"],
+      ["Maghrib", "মাগরিব"],
+      ["Isha", "এশা"]
+    ];
 
-    text(
-      "prayerInfo",
-      `${data.data.date.readable} · ${city} · Method 1`
-    );
+    box.replaceChildren();
+    box.appendChild(makeNode("h3", city + " — নামাজের সময়"));
+    box.appendChild(makeNode(
+      "p",
+      "তারিখ: " + (data.data.date?.readable || ""),
+      "muted"
+    ));
 
-    renderPrayerCards();
+    labels.forEach(([key, label]) => {
+      const row = makeNode("div", undefined, "prayer-row");
+      row.appendChild(makeNode("span", label));
+      row.appendChild(makeNode("strong", formatTime(timings[key])));
+      box.appendChild(row);
+    });
 
-    const now = new Date();
-
-    const next = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"]
-      .map(key => {
-        const [h, m] = timings[key].split(":");
-        const date = new Date();
-        date.setHours(Number(h), Number(m), 0, 0);
-
-        let diff = (date - now) / 60000;
-        if (diff < 0) diff += 1440;
-
-        return { key, diff };
-      })
-      .sort((a, b) => a.diff - b.diff)[0];
-
-    text("nextPrayerName", prayerName(next.key));
-
-    const hours = Math.floor(next.diff / 60);
-    const minutes = Math.floor(next.diff % 60);
-
-    text(
-      "nextPrayerCountdown",
-      language === "en"
-        ? `About ${hours} hours ${minutes} minutes remaining`
-        : `প্রায় ${hours} ঘণ্টা ${minutes} মিনিট বাকি`
-    );
-
-    set(STORE.prayer, { city, timings });
-
-  } catch (error) {
-    console.error(error);
-    text(
-      "prayerInfo",
-      t(
-        "সময়সূচি পাওয়া যায়নি; শহরের নাম ও ইন্টারনেট পরীক্ষা করুন।",
-        "Prayer times unavailable. Check city name and internet."
-      )
-    );
-  }
-}
-
-function renderPrayerCards() {
-  const container = $("#prayerCards");
-  if (!container) return;
-
-  container.innerHTML = Object.keys(prayerNames).map(key => `
-    <div class="prayer-row">
-      <b>${prayerName(key)}</b>
-      <strong>${timings[key] || "—"}</strong>
-    </div>
-  `).join("");
-}
-
-on("prayerBtn", "click", loadPrayerTimes);
-
-const previousPrayer = get(STORE.prayer, null);
-if (previousPrayer) {
-  timings = previousPrayer.timings || {};
-  if ($("#prayerCity")) $("#prayerCity").value = previousPrayer.city;
-  renderPrayerCards();
-} else {
-  loadPrayerTimes();
-}
-
-/* Adhan preferences */
-on("saveAzanPrefs", "click", () => {
-  const selected = $$("[data-prayer-notify]")
-    .filter(el => el.checked)
-    .map(el => el.dataset.prayerNotify);
-
-  set("il-azan-preferences-v2", {
-    selected,
-    reminder: $("#azanReminder")?.value || "0"
-  });
-
-  text(
-    "firebasePushStatus",
-    t("পছন্দ সংরক্ষিত হয়েছে।", "Preferences saved.")
-  );
-});
-
-on("azanNotifyBtn", "click", async () => {
-  if (!("Notification" in window)) {
-    alert(t("এই ব্রাউজারে নোটিফিকেশন সমর্থিত নয়।", "Notifications are not supported."));
-    return;
-  }
-
-  try {
-    const permission = await Notification.requestPermission();
-
-    text(
-      "firebasePushStatus",
-      permission === "granted"
-        ? t(
-            "অনুমতি দেওয়া হয়েছে; নির্ধারিত আজান নোটিফিকেশনের জন্য backend প্রয়োজন।",
-            "Permission granted; a backend is needed for scheduled Adhan notifications."
-          )
-        : t("অনুমতি দেওয়া হয়নি।", "Permission not granted.")
-    );
+    box.appendChild(makeNode(
+      "p",
+      "সময়সূচি স্থানীয় মসজিদ বা ইসলামিক কর্তৃপক্ষের সঙ্গে মিলিয়ে নিন।",
+      "translation"
+    ));
   } catch {
-    text("firebasePushStatus", "Notification error");
+    box.textContent =
+      "নামাজের সময় আনা যায়নি। ইন্টারনেট এবং শহরের ইংরেজি বানান পরীক্ষা করুন।";
   }
-});
+}
 
-/* =====================================
-   QURAN
-===================================== */
+/* ==========================================
+   কুরআন: সূরা, অনুবাদ ও অডিও
+   ========================================== */
 
 let surahs = [];
+let currentSurah = 1;
+let surahLoadToken = 0;
+let audioLoadToken = 0;
 
-async function initQuran() {
+const bookmarkData = readStore(STORE.bookmarks, []);
+
+async function loadSurahList() {
+  const select = $("surahSelect");
+  const search = $("surahSearch");
+  if (!select) return;
+
   try {
-    const response = await fetch("https://api.alquran.cloud/v1/surah");
-    const data = await response.json();
+    const result = await getJSON("https://api.alquran.cloud/v1/surah");
 
-    surahs = data.data || [];
+    if (result.code !== 200 || !Array.isArray(result.data)) {
+      throw new Error("সূরা তালিকা পাওয়া যায়নি।");
+    }
+
+    surahs = result.data;
     renderSurahOptions();
-  } catch (error) {
-    console.error("Surah list error:", error);
+
+    if (search && !search.dataset.listenerAdded) {
+      search.dataset.listenerAdded = "true";
+      search.addEventListener("input", renderSurahOptions);
+    }
+  } catch {
+    setMessage(
+      "quranInfo",
+      "সূরা তালিকা লোড হয়নি। ইন্টারনেট সংযোগ পরীক্ষা করুন।"
+    );
   }
 }
 
 function renderSurahOptions() {
-  const select = $("#surahSelect");
+  const select = $("surahSelect");
+  const query = ($("surahSearch")?.value || "").trim().toLowerCase();
   if (!select) return;
 
-  const previous = select.value;
+  const previousValue = select.value;
+  select.replaceChildren();
 
-  select.innerHTML =
-    `<option value="">${t("সূরা নির্বাচন", "Select Surah")}</option>` +
-    surahs.map(s => `
-      <option value="${s.number}">
-        ${s.number}. ${s.name} — ${s.englishName}
-      </option>
-    `).join("");
+  const filtered = surahs.filter(surah =>
+    String(surah.number).includes(query) ||
+    (surah.name || "").toLowerCase().includes(query) ||
+    (surah.englishName || "").toLowerCase().includes(query) ||
+    (surah.englishNameTranslation || "").toLowerCase().includes(query)
+  );
 
-  select.value = previous;
+  filtered.forEach(surah => {
+    const option = document.createElement("option");
+    option.value = String(surah.number);
+    option.textContent =
+      bnNumber(surah.number) + ". " +
+      surah.name + " — " + surah.englishName;
+    select.appendChild(option);
+  });
+
+  if (!filtered.length) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "কোনো সূরা পাওয়া যায়নি";
+    select.appendChild(option);
+  } else if (filtered.some(item => String(item.number) === previousValue)) {
+    select.value = previousValue;
+  }
 }
 
-on("surahSearch", "input", event => {
-  const query = event.target.value.toLowerCase();
+async function loadSurah() {
+  const number = Number($("surahSelect")?.value);
+  const box = $("quranInfo");
 
-  $$("option", $("#surahSelect")).forEach((option, index) => {
-    if (!index) return;
-    option.hidden = !option.textContent.toLowerCase().includes(query);
-  });
-});
-
-async function loadQuran() {
-  const number = $("#surahSelect")?.value;
-
-  if (!number) {
-    text("quranInfo", t("প্রথমে একটি সূরা নির্বাচন করুন।", "Please select a Surah first."));
+  if (!box || !number || number < 1 || number > 114) {
+    setMessage("quranInfo", "প্রথমে একটি সূরা নির্বাচন করুন।");
     return;
   }
 
-  text("quranInfo", t("লোড হচ্ছে…", "Loading..."));
+  const token = ++surahLoadToken;
+  currentSurah = number;
+  box.textContent = "সূরা ও অনুবাদ লোড হচ্ছে…";
 
   try {
-    const translationEdition = language === "en"
-      ? "en.sahih"
-      : "bn.bengali";
+    const result = await getJSON(
+      `https://api.alquran.cloud/v1/surah/${number}/editions/quran-uthmani,bn.bengali,en.sahih`
+    );
 
-    const [arabicResponse, translationResponse] = await Promise.all([
-      fetch(`https://api.alquran.cloud/v1/surah/${number}/quran-uthmani`),
-      fetch(`https://api.alquran.cloud/v1/surah/${number}/${translationEdition}`)
-    ]);
+    if (token !== surahLoadToken) return;
 
-    const arabicData = await arabicResponse.json();
-    const translationData = await translationResponse.json();
+    const editions = result.data;
 
-    const arabicAyahs = arabicData.data.ayahs;
-    const translatedAyahs = translationData.data.ayahs;
-
-    const surahName = arabicData.data.name;
-
-    html("quranInfo", arabicAyahs.map((ayah, index) => `
-      <article class="content-card ayah">
-        <div class="arabic-text">${ayah.text}</div>
-        <p>${translatedAyahs[index]?.text || ""}</p>
-        <small>${t("আয়াত", "Ayah")} ${ayah.numberInSurah}</small>
-        <button
-          type="button"
-          data-bookmark="${number}:${ayah.numberInSurah}"
-          aria-label="Save ayah"
-        >♡</button>
-      </article>
-    `).join(""));
-
-    const audio = $("#quranAudio");
-    if (audio) {
-      audio.src =
-        `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${number}.mp3`;
+    if (!Array.isArray(editions) || editions.length < 2) {
+      throw new Error("সূরা বা অনুবাদ পাওয়া যায়নি।");
     }
 
-    text("audioTitle", surahName);
+    const arabic = editions[0].ayahs || [];
+    const bangla = editions[1].ayahs || [];
+    const english = editions[2]?.ayahs || [];
 
-  } catch (error) {
-    console.error(error);
-    text("quranInfo", t("সূরা লোড হয়নি", "Could not load Surah."));
+    box.replaceChildren();
+    box.appendChild(makeNode(
+      "h3",
+      (editions[0].name || "সূরা") +
+      " — " + (editions[0].englishName || "")
+    ));
+
+    box.appendChild(makeNode(
+      "p",
+      "মোট আয়াত: " + bnNumber(arabic.length),
+      "muted"
+    ));
+
+    arabic.forEach((ayah, index) => {
+      const card = makeNode("article", undefined, "content-card");
+
+      card.appendChild(makeNode(
+        "h4",
+        "আয়াত " + bnNumber(ayah.numberInSurah || index + 1)
+      ));
+      card.appendChild(makeNode("p", ayah.text, "arabic-text"));
+
+      if (bangla[index]?.text) {
+        card.appendChild(makeNode("p", bangla[index].text));
+      }
+
+      if (english[index]?.text) {
+        card.appendChild(makeNode("p", english[index].text, "translation"));
+      }
+
+      const actions = makeNode("div", undefined, "card-actions");
+
+      addButton(actions, "আয়াত সংরক্ষণ", () => {
+        const bookmark = {
+          surah: number,
+          surahName: editions[0].name || "সূরা",
+          ayah: ayah.numberInSurah || index + 1,
+          arabic: ayah.text,
+          bangla: bangla[index]?.text || ""
+        };
+
+        const exists = bookmarkData.some(item =>
+          item.surah === bookmark.surah &&
+          item.ayah === bookmark.ayah
+        );
+
+        if (exists) {
+          setMessage("audioTitle", "এই আয়াত আগে থেকেই সংরক্ষিত আছে।");
+          return;
+        }
+
+        bookmarkData.push(bookmark);
+        writeStore(STORE.bookmarks, bookmarkData);
+        renderBookmarks();
+        setMessage("audioTitle", "আয়াতটি সংরক্ষণ করা হয়েছে।");
+      });
+
+      addButton(actions, "আরবি কপি", () => copyText(ayah.text));
+      card.appendChild(actions);
+      box.appendChild(card);
+    });
+  } catch {
+    if (token !== surahLoadToken) return;
+    box.textContent =
+      "সূরা লোড হয়নি। ইন্টারনেট সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।";
   }
 }
 
-on("quranBtn", "click", loadQuran);
+function playSurah() {
+  const audio = $("quranAudio");
+  const title = $("audioTitle");
+  const number = Number($("surahSelect")?.value) || currentSurah;
 
-on("playSurahBtn", "click", () => {
-  $("#quranAudio")?.play().catch(() => {});
-});
-
-/* Bookmarks use the original "surah:ayah" format */
-function getBookmarks() {
-  return get(STORE.bookmarks, []);
-}
-
-function saveBookmark(value) {
-  const bookmarks = getBookmarks();
-
-  if (!bookmarks.includes(value)) {
-    bookmarks.push(value);
-    set(STORE.bookmarks, bookmarks);
+  if (!audio) {
+    setMessage(
+      "audioTitle",
+      'HTML-এ id="quranAudio"-সহ audio element পাওয়া যায়নি।'
+    );
+    return;
   }
 
-  renderSaved();
+  if (!number || number < 1 || number > 114) {
+    if (title) title.textContent = "আগে একটি সূরা নির্বাচন করুন।";
+    return;
+  }
+
+  const token = ++audioLoadToken;
+  const surahName = surahs[number - 1]?.englishName || `সূরা ${number}`;
+
+  audio.pause();
+  audio.removeAttribute("src");
+  audio.load();
+
+  audio.onerror = () => {
+    if (token !== audioLoadToken) return;
+    if (title) {
+      title.textContent =
+        "অডিও চালানো যায়নি। ইন্টারনেট, CDN এবং audio element পরীক্ষা করুন।";
+    }
+  };
+
+  audio.oncanplay = () => {
+    if (token !== audioLoadToken) return;
+    if (title) title.textContent = surahName + " — অডিও প্রস্তুত।";
+  };
+
+  audio.onended = () => {
+    if (token === audioLoadToken && title) {
+      title.textContent = surahName + " — অডিও শেষ হয়েছে।";
+    }
+  };
+
+  if (title) title.textContent = surahName + " — অডিও লোড হচ্ছে…";
+
+  audio.src =
+    `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${number}.mp3`;
+
+  audio.load();
+
+  const playPromise = audio.play();
+
+  if (playPromise && typeof playPromise.catch === "function") {
+    playPromise.then(() => {
+      if (token === audioLoadToken && title) {
+        title.textContent = surahName + " — অডিও চলছে।";
+      }
+    }).catch(() => {
+      if (token !== audioLoadToken) return;
+      if (title) {
+        title.textContent =
+          "অডিও প্রস্তুত করার চেষ্টা হয়েছে। নিচের Play বোতামে চাপ দিন।";
+      }
+    });
+  }
 }
 
-document.addEventListener("click", event => {
-  const button = event.target.closest("[data-bookmark]");
-  if (!button) return;
+function renderBookmarks() {
+  const list = $("bookmarkList");
+  if (!list) return;
 
-  saveBookmark(button.dataset.bookmark);
-  button.textContent = "✓";
-});
+  list.replaceChildren();
 
-function renderSaved() {
-  const bookmarks = getBookmarks();
+  if (!bookmarkData.length) {
+    list.appendChild(makeNode(
+      "p",
+      "এখনো কোনো আয়াত সংরক্ষণ করা হয়নি।",
+      "muted"
+    ));
+    return;
+  }
 
-  const content = bookmarks.length
-    ? bookmarks.map(value => {
-        const [surah, ayah] = value.split(":");
+  bookmarkData.forEach((item, index) => {
+    const card = makeNode("article", undefined, "content-card");
 
-        return `
-          <div class="content-card">
-            <p>${t("সূরা", "Surah")} ${surah} · ${t("আয়াত", "Ayah")} ${ayah}</p>
-            <button data-remove-bookmark="${value}">
-              ${t("সংরক্ষণ থেকে সরান", "Remove")}
-            </button>
-          </div>
-        `;
-      }).join("")
-    : `<p>${t("এখনো কোনো আয়াত সংরক্ষণ করা হয়নি।", "No ayahs saved yet.")}</p>`;
+    card.appendChild(makeNode(
+      "h4",
+      `${item.surahName || "সূরা"} — আয়াত ${bnNumber(item.ayah)}`
+    ));
+    card.appendChild(makeNode("p", item.arabic || "", "arabic-text"));
 
-  html("savedList", content);
-  html("bookmarkListSaved", content);
+    if (item.bangla) card.appendChild(makeNode("p", item.bangla));
+
+    addButton(card, "সংরক্ষণ থেকে সরান", () => {
+      bookmarkData.splice(index, 1);
+      writeStore(STORE.bookmarks, bookmarkData);
+      renderBookmarks();
+    });
+
+    list.appendChild(card);
+  });
 }
 
-document.addEventListener("click", event => {
-  const button = event.target.closest("[data-remove-bookmark]");
-  if (!button) return;
+async function copyText(text) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
 
-  const value = button.dataset.removeBookmark;
-  const bookmarks = getBookmarks().filter(x => x !== value);
+      const success = document.execCommand("copy");
+      textarea.remove();
 
-  set(STORE.bookmarks, bookmarks);
-  renderSaved();
-});
+      if (!success) throw new Error("Copy failed");
+    }
 
-/* =====================================
-   DUAS
-===================================== */
+    setMessage("audioTitle", "কপি করা হয়েছে।");
+  } catch {
+    setMessage("audioTitle", "কপি করা যায়নি। লেখাটি নির্বাচন করে কপি করুন।");
+  }
+}
 
-const duas = [
+/* ==========================================
+   দোয়া
+   ========================================== */
+
+const duaData = [
   {
-    title: ["খাওয়ার আগে", "Before Eating"],
-    arabic: "بِسْمِ اللَّهِ",
-    meaning: ["আল্লাহর নামে শুরু করছি।", "In the name of Allah."],
-    source: "সুনান আবু দাউদ ৩৭৬৭"
+    title: "ঘুম থেকে ওঠার দোয়া",
+    category: "daily",
+    arabic: "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ",
+    pronunciation: "আলহামদু লিল্লাহিল্লাযী আহইয়ানা বা‘দা মা আমাতানা ওয়া ইলাইহিন নুশূর।",
+    meaning: "সমস্ত প্রশংসা আল্লাহর, যিনি ঘুমের পর আমাদের জীবিত করেছেন; আর তাঁর কাছেই পুনরুত্থান।",
+    source: "সহিহ আল-বুখারি",
+    categoryName: "দৈনন্দিন"
   },
   {
-    title: ["নিয়তের গুরুত্ব", "Importance of Intention"],
-    arabic: "إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ",
-    meaning: [
-      "নিশ্চয়ই কাজ নিয়তের ওপর নির্ভরশীল।",
-      "Actions are judged by intentions."
-    ],
-    source: "সহিহ বুখারি ১"
+    title: "খাবার শুরুর দোয়া",
+    category: "daily",
+    arabic: "بِسْمِ اللَّهِ",
+    pronunciation: "বিসমিল্লাহ।",
+    meaning: "আল্লাহর নামে শুরু করছি।",
+    source: "খাবার শুরুতে আল্লাহর নাম নেওয়ার শিক্ষা",
+    categoryName: "দৈনন্দিন"
+  },
+  {
+    title: "জ্ঞান বৃদ্ধির দোয়া",
+    category: "daily",
+    arabic: "رَبِّ زِدْنِي عِلْمًا",
+    pronunciation: "রব্বি যিদনী ইলমা।",
+    meaning: "হে আমার রব, আমার জ্ঞান বৃদ্ধি করুন।",
+    source: "কুরআন, সূরা ত্ব-হা ২০:১১৪",
+    categoryName: "দৈনন্দিন"
+  },
+  {
+    title: "দুনিয়া ও আখিরাতের কল্যাণের দোয়া",
+    category: "prayer",
+    arabic: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+    pronunciation: "রব্বানা আতিনা ফিদ্দুনইয়া হাসানাতাওঁ ওয়া ফিল আখিরাতি হাসানাতাওঁ ওয়া কিনা আযাবান্নার।",
+    meaning: "হে আমাদের রব, দুনিয়া ও আখিরাতে কল্যাণ দিন এবং আগুনের শাস্তি থেকে রক্ষা করুন।",
+    source: "কুরআন, সূরা আল-বাকারা ২:২০১",
+    categoryName: "নামাজ ও সাধারণ দোয়া"
+  },
+  {
+    title: "সকাল-সন্ধ্যার সুরক্ষার দোয়া",
+    category: "morning",
+    arabic: "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+    pronunciation: "বিসমিল্লাহিল্লাযী লা ইয়াদুররু মা‘আসমিহী শাইউন ফিল আরদি ওয়ালা ফিস সামা-ই, ওয়া হুয়াস সামীউল আলীম।",
+    meaning: "আল্লাহর নামে, যাঁর নামের সঙ্গে আসমান ও জমিনের কোনো কিছু ক্ষতি করতে পারে না। তিনি সর্বশ্রোতা, সর্বজ্ঞ।",
+    source: "সুনান আবু দাউদ ও জামে আত-তিরমিজিতে বর্ণিত",
+    categoryName: "সকাল-সন্ধ্যা"
+  },
+  {
+    title: "ক্ষমা প্রার্থনা",
+    category: "daily",
+    arabic: "أَسْتَغْفِرُ اللَّهَ",
+    pronunciation: "আস্তাগফিরুল্লাহ।",
+    meaning: "আমি আল্লাহর কাছে ক্ষমা প্রার্থনা করছি।",
+    source: "ইস্তিগফারের সংক্ষিপ্ত বাক্য",
+    categoryName: "দৈনন্দিন"
   }
 ];
 
 function renderDuas() {
-  const query = ($("#duaSearch")?.value || "").toLowerCase();
+  const list = $("duaList");
+  if (!list) return;
 
-  const results = duas.filter(item =>
-    [...item.title, item.arabic, ...item.meaning, item.source]
-      .join(" ")
-      .toLowerCase()
-      .includes(query)
-  );
+  const query = ($("duaSearch")?.value || "").trim().toLowerCase();
+  const category = $("duaCategory")?.value || "all";
 
-  html("duaList", results.length
-    ? results.map(item => `
-        <div class="content-card">
-          <h3>${item.title[language === "en" ? 1 : 0]}</h3>
-          <p class="arabic-text">${item.arabic}</p>
-          <p>${item.meaning[language === "en" ? 1 : 0]}</p>
-          <small>${item.source}</small>
-        </div>
-      `).join("")
-    : `<p>${t("কোনো দোয়া পাওয়া যায়নি।", "No dua found.")}</p>`
-  );
-}
+  list.replaceChildren();
 
-on("duaSearch", "input", renderDuas);
+  const filtered = duaData.filter(dua => {
+    const matchesCategory =
+      category === "all" || dua.category === category;
 
-/* =====================================
-   HADITH
-===================================== */
+    const searchable = [
+      dua.title,
+      dua.arabic,
+      dua.pronunciation,
+      dua.meaning,
+      dua.source
+    ].join(" ").toLowerCase();
 
-const hadiths = [
-  [
-    "নিয়তের গুরুত্ব",
-    "নিশ্চয়ই সকল কাজ নিয়তের ওপর নির্ভরশীল।",
-    "সহিহ বুখারি ১; সহিহ মুসলিম ১৯০৭",
-    "Importance of Intention",
-    "Actions are judged by intentions."
-  ],
-  [
-    "সহজতা",
-    "দ্বীন সহজ।",
-    "সহিহ বুখারি ৩৯",
-    "Ease",
-    "The religion is easy."
-  ]
-];
+    return matchesCategory && searchable.includes(query);
+  });
 
-function renderHadith() {
-  html("hadithInfo", hadiths.map(item => `
-    <div class="content-card">
-      <h3>${item[language === "en" ? 3 : 0]}</h3>
-      <p>${item[language === "en" ? 4 : 1]}</p>
-      <small>${item[2]}</small>
-    </div>
-  `).join(""));
-}
-
-/* =====================================
-   ISLAMIC HISTORY
-===================================== */
-
-const historyItems = [
-  [
-    "নবুয়তের সূচনা",
-    "মক্কায় প্রথম ওহি অবতরণের মাধ্যমে নবুয়তি অধ্যায়ের সূচনা।",
-    "কুরআন ৯৬:১–৫",
-    "Beginning of Prophethood",
-    "The first revelation in Makkah marked the beginning of Prophethood."
-  ],
-  [
-    "হিজরত",
-    "মক্কা থেকে মদিনায় হিজরত মুসলিম ইতিহাসে গুরুত্বপূর্ণ মোড়।",
-    "কুরআন ৯:৪০",
-    "Hijrah",
-    "The migration from Makkah to Madinah was a major turning point."
-  ],
-  [
-    "খুলাফায়ে রাশেদিন",
-    "প্রথম চার খলিফার যুগ প্রাথমিক মুসলিম ইতিহাসের গুরুত্বপূর্ণ অধ্যায়।",
-    "প্রাথমিক ইসলামী ইতিহাসগ্রন্থ",
-    "The Rightly Guided Caliphs",
-    "The era of the first four caliphs is an important part of early Islamic history."
-  ]
-];
-
-function renderHistory() {
-  html("historyList", historyItems.map(item => `
-    <div class="content-card">
-      <h3>${item[language === "en" ? 3 : 0]}</h3>
-      <p>${item[language === "en" ? 4 : 1]}</p>
-      <small>${item[2]}</small>
-    </div>
-  `).join(""));
-}
-
-/* =====================================
-   PROPHETS
-===================================== */
-
-const prophets = [
-  "আদম", "ইদ্রিস", "নূহ", "হুদ", "সালিহ",
-  "ইবরাহিম", "লূত", "ইসমাইল", "ইসহাক", "ইয়াকুব",
-  "ইউসুফ", "আইয়ুব", "শুআইব", "মূসা", "হারুন",
-  "যুলকিফল", "দাউদ", "সুলাইমান", "ইলিয়াস",
-  "আল-ইয়াসা", "ইউনুস", "যাকারিয়া", "ইয়াহইয়া",
-  "ঈসা", "মুহাম্মদ ﷺ"
-];
-
-const prophetsEnglish = [
-  "Adam", "Idris", "Nuh", "Hud", "Salih",
-  "Ibrahim", "Lut", "Ismail", "Ishaq", "Yaqub",
-  "Yusuf", "Ayyub", "Shuayb", "Musa", "Harun",
-  "Dhul-Kifl", "Dawud", "Sulayman", "Ilyas",
-  "Al-Yasa", "Yunus", "Zakariya", "Yahya",
-  "Isa", "Muhammad ﷺ"
-];
-
-function renderProphets() {
-  html("prophetList", prophets.map((name, index) => `
-    <div class="content-card">
-      ${index + 1}. ${language === "en" ? prophetsEnglish[index] : name}
-      <p class="muted">
-        ${t(
-          "বিস্তারিত জানতে সংশ্লিষ্ট কুরআনের আয়াত ও নির্ভরযোগ্য তাফসির পড়ুন।",
-          "Read the relevant Quranic verses and reliable Tafsir for details."
-        )}
-      </p>
-    </div>
-  `).join(""));
-}
-
-/* =====================================
-   COMPANIONS
-===================================== */
-
-const companions = [
-  ["আবু বকর (রা.)", "প্রথম খলিফা; প্রাথমিক মুসলিম সমাজে গুরুত্বপূর্ণ ভূমিকা।", "Abu Bakr (RA)", "The first caliph and an important early Muslim leader."],
-  ["উমর (রা.)", "দ্বিতীয় খলিফা; প্রশাসনিক ইতিহাসে গুরুত্বপূর্ণ।", "Umar (RA)", "The second caliph, known for his leadership."],
-  ["উসমান (রা.)", "তৃতীয় খলিফা; মুসহাফ সংরক্ষণের প্রচেষ্টার সঙ্গে যুক্ত।", "Uthman (RA)", "The third caliph, associated with the standardization of the Mushaf."],
-  ["আলী (রা.)", "চতুর্থ খলিফা; প্রাথমিক ইসলামের গুরুত্বপূর্ণ ব্যক্তিত্ব।", "Ali (RA)", "The fourth caliph and an important early Muslim figure."],
-  ["খাদিজা (রা.)", "প্রথম ঈমান গ্রহণকারীদের একজন।", "Khadijah (RA)", "One of the earliest believers."],
-  ["আয়িশা (রা.)", "হাদিস ও জ্ঞানচর্চায় বিশিষ্ট বর্ণনাকারী।", "Aishah (RA)", "A distinguished narrator of Hadith and Islamic knowledge."]
-];
-
-function renderCompanions() {
-  html("companionList", companions.map(item => `
-    <div class="content-card">
-      <h3>${item[language === "en" ? 2 : 0]}</h3>
-      <p>${item[language === "en" ? 3 : 1]}</p>
-    </div>
-  `).join(""));
-}
-
-/* =====================================
-   HIJRI DATE
-===================================== */
-
-async function loadHijri() {
-  try {
-    const date = new Date();
-    const dateString =
-      `${String(date.getDate()).padStart(2, "0")}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getFullYear()}`;
-
-    const response = await fetch(
-      `https://api.aladhan.com/v1/gToH?date=${dateString}`
-    );
-
-    const data = await response.json();
-    const hijri = data.data.hijri;
-
-    const value = language === "en"
-      ? `${hijri.day} ${hijri.month.en} ${hijri.year} AH`
-      : `${hijri.day} ${hijri.month.ar} ${hijri.year} হিজরি`;
-
-    text("hijriInfo", value);
-    text("hijriQuick", value);
-
-  } catch {
-    text("hijriInfo", t("তারিখ পাওয়া যায়নি", "Date unavailable"));
-  }
-}
-
-on("hijriBtnFull", "click", loadHijri);
-
-/* =====================================
-   RAMADAN CALENDAR
-===================================== */
-
-async function loadRamadan() {
-  const city = $("#ramadanCity")?.value || "Dhaka";
-  const date = new Date();
-
-  text("ramadanInfo", t("লোড হচ্ছে…", "Loading..."));
-
-  try {
-    const response = await fetch(
-      `https://api.aladhan.com/v1/calendarByCity/${date.getFullYear()}/${date.getMonth() + 1}?city=${encodeURIComponent(city)}&country=Bangladesh&method=1`
-    );
-
-    const data = await response.json();
-
-    html("ramadanInfo", data.data.slice(0, 10).map(item => `
-      <div class="content-card">
-        ${item.date.readable}
-        <p>
-          ${t("সেহরি শেষ", "Suhoor ends")} ${item.timings.Fajr}
-          ·
-          ${t("ইফতার", "Iftar")} ${item.timings.Maghrib}
-        </p>
-      </div>
-    `).join(""));
-
-  } catch {
-    text("ramadanInfo", t("সময়সূচি পাওয়া যায়নি", "Schedule unavailable"));
-  }
-}
-
-on("ramadanBtn", "click", loadRamadan);
-
-/* =====================================
-   QIBLA
-===================================== */
-
-function calculateQibla(latitude, longitude) {
-  const lat = latitude * Math.PI / 180;
-  const kaabaLat = 21.4225 * Math.PI / 180;
-  const longitudeDifference = (39.8262 - longitude) * Math.PI / 180;
-
-  const angle = Math.atan2(
-    Math.sin(longitudeDifference),
-    Math.cos(lat) * Math.tan(kaabaLat) -
-    Math.sin(lat) * Math.cos(longitudeDifference)
-  );
-
-  return (angle * 180 / Math.PI + 360) % 360;
-}
-
-on("qiblaBtn", "click", () => {
-  if (!navigator.geolocation) {
-    text("qiblaDegree", t("লোকেশন সমর্থিত নয়", "Location not supported"));
+  if (!filtered.length) {
+    list.appendChild(makeNode("p", "কোনো দোয়া পাওয়া যায়নি।", "muted"));
     return;
   }
 
-  text("qiblaDegree", t("অবস্থান খোঁজা হচ্ছে…", "Getting location..."));
+  filtered.forEach(dua => {
+    const card = makeNode("article", undefined, "content-card");
 
-  navigator.geolocation.getCurrentPosition(
-    position => {
-      const degree = calculateQibla(
-        position.coords.latitude,
-        position.coords.longitude
+    card.appendChild(makeNode("h3", dua.title));
+    card.appendChild(makeNode("p", dua.arabic, "arabic-text"));
+    card.appendChild(makeNode("h4", "বাংলা উচ্চারণ"));
+    card.appendChild(makeNode("p", dua.pronunciation));
+    card.appendChild(makeNode("h4", "অর্থ"));
+    card.appendChild(makeNode("p", dua.meaning));
+    card.appendChild(makeNode("p", "উৎস: " + dua.source, "translation"));
+
+    const actions = makeNode("div", undefined, "card-actions");
+
+    addButton(actions, "দোয়া কপি", () => {
+      copyText(
+        dua.arabic + "\n" +
+        dua.pronunciation + "\n" +
+        dua.meaning
       );
+    });
 
-      text("qiblaDegree", Math.round(degree) + "°");
-
-      const needle = $("#compassNeedle");
-      if (needle) {
-        needle.style.transform =
-          `translateX(-50%) rotate(${degree}deg)`;
-      }
-    },
-    () => {
-      text("qiblaDegree", t("লোকেশন অনুমতি দিন", "Allow location access"));
-    },
-    { enableHighAccuracy: true, timeout: 15000 }
-  );
-});
-
-/* =====================================
-   TASBIH
-===================================== */
-
-let tasbihCount = get(STORE.tasbih, 0);
-
-function renderTasbih() {
-  text("tasbihCount", tasbihCount.toLocaleString(
-    language === "en" ? "en-US" : "bn-BD"
-  ));
+    card.appendChild(actions);
+    list.appendChild(card);
+  });
 }
 
-on("tasbihBtn", "click", () => {
-  tasbihCount++;
-  set(STORE.tasbih, tasbihCount);
-  renderTasbih();
-});
+/* ==========================================
+   হাদিস
+   ========================================== */
 
-on("resetBtn", "click", () => {
-  tasbihCount = 0;
-  set(STORE.tasbih, 0);
-  renderTasbih();
-});
-
-/* =====================================
-   DAILY AMAL
-===================================== */
-
-const amalKey =
-  "il-amal-" + new Date().toISOString().slice(0, 10);
-
-let amal = get(amalKey, []);
-
-function renderAmal() {
-  const checks = $$(".amal-check");
-
-  checks.forEach((checkbox, index) => {
-    checkbox.checked = !!amal[index];
-  });
-
-  const completed = amal.filter(Boolean).length;
-  const total = checks.length || 5;
-
-  text(
-    "amalProgress",
-    `${completed}/${total} ${t("সম্পন্ন", "completed")}`
-  );
-
-  const bar = $("#amalProgressBar");
-  if (bar) {
-    bar.style.width = (completed / total * 100) + "%";
-  }
-
-  text(
-    "dailySummary",
-    language === "en"
-      ? `${completed} daily deeds completed today.`
-      : `আজ ${completed}টি আমল সম্পন্ন।`
-  );
-}
-
-$$(".amal-check").forEach((checkbox, index) => {
-  checkbox.addEventListener("change", () => {
-    amal[index] = checkbox.checked;
-    set(amalKey, amal);
-    renderAmal();
-  });
-});
-
-/* =====================================
-   ZAKAT CALCULATOR
-===================================== */
-
-on("zakatBtn", "click", () => {
-  const assets = safeNumber($("#zakatAssets")?.value);
-  const debts = safeNumber($("#zakatDebts")?.value);
-  const net = Math.max(0, assets - debts);
-  const zakat = net * 0.025;
-
-  const formatter = new Intl.NumberFormat(
-    language === "en" ? "en-BD" : "bn-BD"
-  );
-
-  text(
-    "zakatInfo",
-    language === "en"
-      ? `Net assets: ৳${formatter.format(net)} · Estimated Zakat (2.5%): ৳${formatter.format(zakat)}. Check Nisab, Hawl and eligible assets.`
-      : `নিট সম্পদ ৳${formatter.format(net)} · আনুমানিক যাকাত ২.৫% = ৳${formatter.format(zakat)}। নিসাব, হাওল ও সম্পদের ধরন যাচাই করুন।`
-  );
-});
-
-/* =====================================
-   ISLAMIC QUIZ
-===================================== */
-
-const quiz = [
+const hadithData = [
   {
-    question: [
-      "কুরআনের প্রথম অবতীর্ণ আয়াত কোন সূরায়?",
-      "Which Surah contains the first revealed verses?"
-    ],
-    options: [
-      ["ফাতিহা", "আল-আলাক", "ইখলাস"],
-      ["Al-Fatihah", "Al-Alaq", "Al-Ikhlas"]
-    ],
-    answer: 1,
-    source: "সূরা আল-আলাক ৯৬:১–৫"
+    text: "কাজের প্রতিদান নিয়তের ওপর নির্ভরশীল।",
+    source: "সহিহ আল-বুখারি, হাদিস ১; সহিহ মুসলিমেও বর্ণিত",
+    lesson: "ইবাদত ও কাজের ক্ষেত্রে আন্তরিক নিয়ত গুরুত্বপূর্ণ।"
   },
   {
-    question: ["কিবলা কোনটি?", "What is the Qibla?"],
-    options: [
-      ["কাবা", "মসজিদে নববি", "মসজিদুল আকসা"],
-      ["The Kaaba", "Prophet's Mosque", "Al-Aqsa Mosque"]
-    ],
-    answer: 0,
-    source: "কাবা শরিফ"
+    text: "যে ব্যক্তি আল্লাহ ও শেষ দিনের প্রতি ঈমান রাখে, সে যেন ভালো কথা বলে অথবা নীরব থাকে।",
+    source: "সহিহ আল-বুখারি ও সহিহ মুসলিম",
+    lesson: "কথা বলার আগে তার উপকারিতা ও ক্ষতির কথা ভাবা উচিত।"
+  },
+  {
+    text: "তোমাদের মধ্যে উত্তম সে, যে কুরআন শেখে এবং শেখায়।",
+    source: "সহিহ আল-বুখারি, হাদিস ৫০২৭",
+    lesson: "কুরআন শেখা ও অন্যকে শেখানো মর্যাদাপূর্ণ কাজ।"
   }
 ];
 
-let quizIndex = 0;
+let hadithIndex = 0;
 
-function renderQuiz() {
-  const item = quiz[quizIndex];
+function showHadith() {
+  const box = $("hadithInfo");
+  if (!box) return;
 
-  text(
-    "quizQuestion",
-    item.question[language === "en" ? 1 : 0]
-  );
+  const hadith = hadithData[hadithIndex % hadithData.length];
+  hadithIndex++;
 
-  html(
-    "quizOptions",
-    item.options[language === "en" ? 1 : 0]
-      .map((option, index) => `
-        <button type="button" data-answer="${index}">
-          ${option}
-        </button>
-      `).join("")
-  );
-
-  text("quizFeedback", "");
+  box.replaceChildren();
+  box.appendChild(makeNode("p", "“" + hadith.text + "”"));
+  box.appendChild(makeNode("p", "শিক্ষা: " + hadith.lesson));
+  box.appendChild(makeNode("p", "উৎস: " + hadith.source, "translation"));
 }
 
-on("quizStartBtn", "click", () => {
-  quizIndex = 0;
-  renderQuiz();
-});
+/* ==========================================
+   হিজরি তারিখ
+   ========================================== */
 
-on("quizNextBtn", "click", () => {
-  quizIndex = (quizIndex + 1) % quiz.length;
-  renderQuiz();
-});
+async function loadHijri() {
+  const box = $("hijriInfo");
+  const quick = $("hijriQuick");
 
-on("quizOptions", "click", event => {
-  const button = event.target.closest("[data-answer]");
-  if (!button) return;
+  if (box) box.textContent = "হিজরি তারিখ লোড হচ্ছে…";
 
-  const answer = Number(button.dataset.answer);
-  const item = quiz[quizIndex];
+  try {
+    const now = new Date();
 
-  const correct = answer === item.answer;
+    const date = [
+      String(now.getDate()).padStart(2, "0"),
+      String(now.getMonth() + 1).padStart(2, "0"),
+      now.getFullYear()
+    ].join("-");
 
-  text(
-    "quizFeedback",
-    correct
-      ? `${t("সঠিক!", "Correct!")} ${item.source}`
-      : `${t("সঠিক উত্তর:", "Correct answer:")} ${item.options[language === "en" ? 1 : 0][item.answer]}`
-  );
+    const data = await getJSON(
+      "https://api.aladhan.com/v1/gToH/" + date
+    );
 
-  $$("[data-answer]").forEach(option => {
-    option.disabled = true;
-  });
-});
+    const hijri = data.data?.hijri;
+    if (!hijri) throw new Error("হিজরি তারিখ পাওয়া যায়নি।");
 
-/* =====================================
-   MOSQUE FINDER
-===================================== */
+    const text =
+      `${hijri.day} ${hijri.month.en} ${hijri.year} AH`;
 
-on("mosqueBtn", "click", () => {
-  window.open(
-    "https://www.google.com/maps/search/mosque+near+me/",
-    "_blank",
-    "noopener"
-  );
-});
+    if (quick) {
+      quick.textContent =
+        `${hijri.day} ${hijri.month.ar || hijri.month.en} ${hijri.year}`;
+    }
 
-/* =====================================
-   DYNAMIC CONTENT REFRESH
-===================================== */
+    if (box) {
+      box.replaceChildren();
+      box.appendChild(makeNode("h3", "হিজরি তারিখ"));
+      box.appendChild(makeNode("p", text));
+      box.appendChild(makeNode(
+        "p",
+        "স্থানীয় চাঁদ দেখা অনুযায়ী তারিখ এক দিন এদিক-সেদিক হতে পারে।",
+        "translation"
+      ));
+    }
+  } catch {
+    if (box) {
+      box.textContent = "হিজরি তারিখ এখন পাওয়া যাচ্ছে না। পরে চেষ্টা করুন।";
+    }
 
-function renderDynamicContent() {
-  showToday();
-  renderSurahOptions();
-  renderPrayerCards();
-  renderDuas();
-  renderHadith();
-  renderHistory();
-  renderProphets();
-  renderCompanions();
-  renderSaved();
-  renderTasbih();
-  renderAmal();
-  loadHijri();
-
-  if ($("#quizQuestion")?.textContent) {
-    renderQuiz();
+    if (quick) quick.textContent = "তথ্য পাওয়া যায়নি";
   }
 }
 
-/* =====================================
-   SERVICE WORKER
-===================================== */
+/* ==========================================
+   চলতি মাসের সেহরি ও ইফতারের সময়সূচি
+   ========================================== */
 
-if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("./sw.js")
-      .catch(error => console.warn("Service worker:", error));
+async function loadRamadanCalendar() {
+  const city = $("ramadanCity")?.value.trim() || "Dhaka";
+  const box = $("ramadanInfo");
+  if (!box) return;
+
+  box.textContent = "সময়সূচি লোড হচ্ছে…";
+
+  try {
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const year = now.getFullYear();
+
+    const url =
+      "https://api.aladhan.com/v1/calendarByCity/" +
+      year + "/" + month +
+      "?city=" + encodeURIComponent(city) +
+      "&country=Bangladesh&method=1";
+
+    const result = await getJSON(url);
+
+    if (!Array.isArray(result.data)) {
+      throw new Error("সময়সূচি পাওয়া যায়নি।");
+    }
+
+    box.replaceChildren();
+    box.appendChild(makeNode("h3", city + " — চলতি মাসের সময়সূচি"));
+    box.appendChild(makeNode(
+      "p",
+      "এটি চলতি গ্রেগরিয়ান মাসের সময়সূচি; পূর্ণ রমজান ক্যালেন্ডার নাও হতে পারে।",
+      "translation"
+    ));
+
+    result.data.forEach(day => {
+      const timings = day.timings || {};
+      const row = makeNode("div", undefined, "prayer-row");
+
+      row.appendChild(makeNode(
+        "span",
+        `তারিখ ${bnNumber(day.date?.gregorian?.day || "")} (হিজরি ${bnNumber(day.date?.hijri?.day || "")})`
+      ));
+
+      row.appendChild(makeNode(
+        "strong",
+        `সেহরি শেষ: ${formatTime(timings.Fajr)} · ইফতার: ${formatTime(timings.Maghrib)}`
+      ));
+
+      box.appendChild(row);
+    });
+  } catch {
+    box.textContent =
+      "সময়সূচি লোড হয়নি। ইন্টারনেট এবং শহরের ইংরেজি বানান পরীক্ষা করুন।";
+  }
+}
+
+/* ==========================================
+   কিবলার দিক
+   ========================================== */
+
+function calculateQibla(lat, lon) {
+  const kaabaLat = 21.4225 * Math.PI / 180;
+  const kaabaLon = 39.8262 * Math.PI / 180;
+  const userLat = lat * Math.PI / 180;
+  const userLon = lon * Math.PI / 180;
+  const deltaLon = kaabaLon - userLon;
+
+  const y = Math.sin(deltaLon);
+  const x =
+    Math.cos(userLat) * Math.tan(kaabaLat) -
+    Math.sin(userLat) * Math.cos(deltaLon);
+
+  return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+}
+
+function setupQibla() {
+  const button = $("qiblaBtn");
+  if (!button) return;
+
+  button.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      setMessage("qiblaDegree", "এই ডিভাইসে অবস্থান নির্ণয়ের সুবিধা নেই।");
+      return;
+    }
+
+    setMessage("qiblaDegree", "অবস্থানের অনুমতি চাইছে…");
+
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        const { latitude, longitude } = position.coords;
+        const degree = calculateQibla(latitude, longitude);
+        const needle = $("compassNeedle");
+
+        if (needle) {
+          needle.style.transform = `rotate(${degree}deg)`;
+        }
+
+        setMessage(
+          "qiblaDegree",
+          "উত্তর দিক থেকে ঘড়ির কাঁটার দিকে কিবলার কোণ: " +
+          bnNumber(degree.toFixed(1)) +
+          "°। এটি গণনাভিত্তিক দিক; ফোনের কম্পাস সেন্সর আলাদাভাবে প্রয়োজন।"
+        );
+      },
+      error => {
+        setMessage(
+          "qiblaDegree",
+          error.code === 1
+            ? "অবস্থানের অনুমতি দেওয়া হয়নি। ব্রাউজারের সাইট সেটিংসে অনুমতি দিন।"
+            : "অবস্থান পাওয়া যায়নি। GPS চালু করে আবার চেষ্টা করুন।"
+        );
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 12000,
+        maximumAge: 60000
+      }
+    );
   });
 }
 
-/* =====================================
-   APP START
-===================================== */
+/* ==========================================
+   ডিজিটাল তাসবিহ
+   ========================================== */
 
-function startApp() {
-  setupTheme();
-  setupProfile();
-  setupLanguage();
+let tasbihCount = Number(readStore(STORE.tasbih, 0));
 
-  showToday();
-  renderDuas();
-  renderHadith();
-  renderHistory();
-  renderProphets();
-  renderCompanions();
-  renderSaved();
+if (!Number.isFinite(tasbihCount) || tasbihCount < 0) {
+  tasbihCount = 0;
+}
+
+function renderTasbih() {
+  setMessage("tasbihCount", bnNumber(tasbihCount));
+}
+
+function setupTasbih() {
+  $("tasbihBtn")?.addEventListener("click", () => {
+    tasbihCount++;
+    writeStore(STORE.tasbih, tasbihCount);
+    renderTasbih();
+  });
+
+  $("resetBtn")?.addEventListener("click", () => {
+    tasbihCount = 0;
+    writeStore(STORE.tasbih, tasbihCount);
+    renderTasbih();
+  });
+
   renderTasbih();
-  renderAmal();
-  renderSurahOptions();
-  renderPrayerCards();
-  loadHijri();
+}
 
-  showScreen("home");
-  initQuran();
+/* ==========================================
+   দৈনিক আমল
+   ========================================== */
+
+const amalChecks = Array.from(
+  document.querySelectorAll(".amal-check")
+);
+
+function todayKey() {
+  const now = new Date();
+
+  return [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0")
+  ].join("-");
+}
+
+function setupAmal() {
+  const all = readStore(STORE.amal, {});
+  const saved = all[todayKey()] || {};
+
+  amalChecks.forEach(check => {
+    check.checked = Boolean(saved[check.value]);
+
+    check.addEventListener("change", () => {
+      const current = readStore(STORE.amal, {});
+      current[todayKey()] = current[todayKey()] || {};
+      current[todayKey()][check.value] = check.checked;
+
+      writeStore(STORE.amal, current);
+      renderAmalProgress();
+    });
+  });
+
+  renderAmalProgress();
+}
+
+function renderAmalProgress() {
+  const total = amalChecks.length;
+  const checked = amalChecks.filter(item => item.checked).length;
+  const percent = total
+    ? Math.round((checked / total) * 100)
+    : 0;
+
+  setMessage("amalProgress", `${bnNumber(percent)}% সম্পন্ন`);
+
+  const bar = $("amalProgressBar");
+  if (bar) bar.style.width = percent + "%";
+}
+
+/* ==========================================
+   যাকাতের প্রাথমিক হিসাব
+   ========================================== */
+
+function setupZakat() {
+  $("zakatBtn")?.addEventListener("click", () => {
+    const assets = Number($("zakatAssets")?.value);
+    const debts = Number($("zakatDebts")?.value);
+    const box = $("zakatInfo");
+
+    if (!box) return;
+
+    if (
+      !Number.isFinite(assets) ||
+      !Number.isFinite(debts) ||
+      assets < 0 ||
+      debts < 0
+    ) {
+      box.textContent =
+        "সঠিক সংখ্যা লিখুন; সংখ্যা শূন্যের কম হতে পারবে না।";
+      return;
+    }
+
+    const net = Math.max(0, assets - debts);
+    const zakat = net * 0.025;
+
+    box.replaceChildren();
+
+    box.appendChild(makeNode(
+      "p",
+      "প্রাথমিক হিসাবযোগ্য নিট সম্পদ: ৳" +
+      net.toLocaleString("en-BD", {
+        maximumFractionDigits: 2
+      })
+    ));
+
+    box.appendChild(makeNode(
+      "h3",
+      "২.৫% অনুযায়ী: ৳" +
+      zakat.toLocaleString("en-BD", {
+        maximumFractionDigits: 2
+      })
+    ));
+
+    box.appendChild(makeNode(
+      "p",
+      "এটি প্রাথমিক হিসাব। নিসাব, সম্পদের ধরন, মালিকানার সময়কাল ও প্রযোজ্য বিধান যাচাই করে চূড়ান্ত হিসাব করুন।",
+      "translation"
+    ));
+  });
+}
+
+/* ==========================================
+   সব ইভেন্ট ও অ্যাপ চালু
+   ========================================== */
+
+function setupEvents() {
+  $("prayerBtn")?.addEventListener("click", loadPrayerTimes);
+
+  $("quranBtn")?.addEventListener("click", loadSurah);
+  $("playSurahBtn")?.addEventListener("click", playSurah);
+
+  $("duaSearch")?.addEventListener("input", renderDuas);
+  $("duaCategory")?.addEventListener("change", renderDuas);
+
+  $("hadithBtn")?.addEventListener("click", showHadith);
+
+  $("hijriBtn")?.addEventListener("click", loadHijri);
+  $("hijriBtnFull")?.addEventListener("click", loadHijri);
+
+  $("ramadanBtn")?.addEventListener("click", loadRamadanCalendar);
+}
+
+function initApp() {
+  showToday();
+  setupTheme();
+  setupCreatorModal();
+  setupNiyat();
+  setupTasbih();
+  setupAmal();
+  setupZakat();
+  setupQibla();
+  setupEvents();
+
+  renderDuas();
+  renderBookmarks();
+  loadSurahList();
+
+  // ব্যবহারকারী বোতাম চাপলে অনলাইন ফিচার চালু হবে।
 }
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", startApp);
+  document.addEventListener("DOMContentLoaded", initApp);
 } else {
-  startApp();
+  initApp();
 }
 
-})();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js")
+      .then(() => {
+        console.log("Islamic Life Service Worker চালু হয়েছে।");
+      })
+      .catch(error => {
+        console.error("Service Worker Error:", error);
+      });
+  });
+}
