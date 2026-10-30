@@ -1,275 +1,562 @@
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#073d30">
-<title>আমি মুসলিম | Islamic Life</title>
-<link rel="manifest" href="./manifest.json">
-<link rel="stylesheet" href="./style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#075c46">
+  <meta name="description" content="আমি মুসলিম | Islamic Life — আপনার প্রতিদিনের ইসলামিক সঙ্গী।">
+  <title>আমি মুসলিম | Islamic Life</title>
+  <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
-<div class="shell">
 
-<header>
-<button class="brand" data-screen="home">
-☪ <span>আমি মুসলিম<small>ISLAMIC LIFE</small></span>
-</button>
-<div>
-<select id="languageSelect">
-<option value="bn">বাংলা</option>
-<option value="en">English</option>
-</select>
-<button id="darkModeBtn">◐</button>
-</div>
-</header>
+  <!-- HEADER -->
+  <header class="app-header">
+    <button class="brand" data-screen="home" type="button">
+      <span class="brand-icon">☪</span>
+      <span>আমি মুসলিম</span>
+    </button>
 
-<main>
+    <div class="header-actions">
+      <select id="languageSelect" aria-label="Select language">
+        <option value="bn">বাংলা</option>
+        <option value="en">English</option>
+      </select>
 
-<section class="screen active" id="screen-home">
-<div class="hero">
-<small>আসসালামু আলাইকুম</small>
-<h1 id="welcomeTitle">আপনার প্রতিদিনের<br>ইসলামিক সঙ্গী</h1>
-<p id="todayDate"></p>
-<p id="hijriQuick"></p>
-</div>
+      <button id="darkModeBtn" type="button" aria-label="Toggle dark mode">
+        ◐
+      </button>
+    </div>
+  </header>
 
-<div class="section">
-<h2>পরবর্তী নামাজ</h2>
-<div class="panel">
-<h2 id="nextPrayerName">নামাজের সময়</h2>
-<p id="nextPrayerCountdown">শহর অনুযায়ী সময় দেখুন</p>
-</div>
-</div>
+  <main class="app-main">
 
-<div class="tiles">
-<button data-screen="quran">۞<b>আল-কুরআন</b></button>
-<button data-screen="prayer">◷<b>নামাজের সময়</b></button>
-<button data-screen="qibla">⌖<b>কিবলা</b></button>
-<button data-screen="tasbih">◎<b>তাসবিহ</b></button>
-<button data-screen="history">⌂<b>ইতিহাস</b></button>
-<button data-screen="amal">✓<b>দৈনিক আমল</b></button>
-</div>
-</section>
+    <!-- HOME -->
+    <section id="screen-home" class="screen active">
+      <div class="hero">
+        <div class="hero-content">
+          <p class="eyebrow">☪ ISLAMIC LIFE</p>
+          <h1 id="welcomeTitle">আসসালামু আলাইকুম</h1>
+          <h2>আপনার প্রতিদিনের ইসলামিক সঙ্গী</h2>
+          <p id="todayDate"></p>
+          <p id="hijriQuick"></p>
+        </div>
+      </div>
 
-<section class="screen" id="screen-menu">
-<h1>সকল বিভাগ</h1>
-<div class="tiles">
-<button data-screen="quran">۞<b>কুরআন</b></button>
-<button data-screen="prayer">◷<b>নামাজ ও আজান</b></button>
-<button data-screen="duas">✧<b>দোয়া ও জিকির</b></button>
-<button data-screen="hadith">❞<b>হাদিস</b></button>
-<button data-screen="history">⌂<b>ইসলামের ইতিহাস</b></button>
-<button data-screen="prophets">☾<b>নবী-রাসুল</b></button>
-<button data-screen="companions">♧<b>সাহাবিগণ</b></button>
-<button data-screen="calendar">▦<b>হিজরি ক্যালেন্ডার</b></button>
-<button data-screen="ramadan">☽<b>রমজান</b></button>
-<button data-screen="qibla">⌖<b>কিবলা</b></button>
-<button data-screen="tasbih">◎<b>তাসবিহ</b></button>
-<button data-screen="amal">✓<b>আমল</b></button>
-<button data-screen="zakat">৳<b>যাকাত</b></button>
-<button data-screen="quiz">?<b>কুইজ</b></button>
-<button data-screen="mosques">⌂<b>মসজিদ</b></button>
-<button data-screen="saved">♡<b>সংরক্ষিত</b></button>
-</div>
-</section>
+      <div class="next-prayer-card">
+        <p>পরবর্তী নামাজ</p>
+        <h2 id="nextPrayerName">--</h2>
+        <p id="nextPrayerCountdown">--</p>
+      </div>
 
-<section class="screen" id="screen-prayer">
-<h1>নামাজের সময়</h1>
-<div class="row">
-<input id="prayerCity" value="Dhaka" placeholder="শহর">
-<button id="prayerBtn">সময় দেখুন</button>
-</div>
-<p id="prayerInfo"></p>
-<div id="prayerCards"></div>
+      <div class="section-heading">
+        <h2>ইসলামিক সেবা</h2>
+        <p>আপনার প্রয়োজনীয় সবকিছু এক জায়গায়</p>
+      </div>
 
-<div class="panel">
-<h3>আজানের নোটিফিকেশন</h3>
-<div class="checks">
-<label><input type="checkbox" data-prayer-notify="Fajr"> ফজর</label>
-<label><input type="checkbox" data-prayer-notify="Dhuhr"> যোহর</label>
-<label><input type="checkbox" data-prayer-notify="Asr"> আসর</label>
-<label><input type="checkbox" data-prayer-notify="Maghrib"> মাগরিব</label>
-<label><input type="checkbox" data-prayer-notify="Isha"> এশা</label>
-</div>
-<select id="azanReminder">
-<option value="0">ঠিক সময়ে</option>
-<option value="5">৫ মিনিট আগে</option>
-<option value="10">১০ মিনিট আগে</option>
-</select>
-<button id="saveAzanPrefs">পছন্দ সংরক্ষণ</button>
-<button id="azanNotifyBtn">নোটিফিকেশন চালু করুন</button>
-<p id="firebasePushStatus"></p>
-</div>
-</section>
+      <div class="home-grid">
+        <button class="feature-card" data-screen="prayer">
+          <span>🕌</span><strong>নামাজের সময়</strong>
+        </button>
+        <button class="feature-card" data-screen="quran">
+          <span>📖</span><strong>আল-কুরআন</strong>
+        </button>
+        <button class="feature-card" data-screen="duas">
+          <span>🤲</span><strong>দোয়া ও জিকির</strong>
+        </button>
+        <button class="feature-card" data-screen="hadith">
+          <span>📚</span><strong>হাদিস</strong>
+        </button>
+        <button class="feature-card" data-screen="qibla">
+          <span>🧭</span><strong>কিবলা</strong>
+        </button>
+        <button class="feature-card" data-screen="tasbih">
+          <span>📿</span><strong>তাসবিহ</strong>
+        </button>
+        <button class="feature-card" data-screen="calendar">
+          <span>🌙</span><strong>হিজরি ক্যালেন্ডার</strong>
+        </button>
+        <button class="feature-card" data-screen="amal">
+          <span>✨</span><strong>দৈনিক আমল</strong>
+        </button>
+      </div>
+    </section>
 
-<section class="screen" id="screen-quran">
-<h1>আল-কুরআন</h1>
-<select id="surahSelect">
-<option value="">সূরা নির্বাচন</option>
-</select>
-<button id="quranBtn">পড়ুন</button>
-<input id="surahSearch" placeholder="সূরা খুঁজুন">
-<div id="quranInfo"></div>
-<h3 id="audioTitle">তিলাওয়াত</h3>
-<audio id="quranAudio" controls></audio>
-<button id="playSurahBtn">শুনুন</button>
-<div id="bookmarkList"></div>
-</section>
+    <!-- MENU -->
+    <section id="screen-menu" class="screen">
+      <div class="page-heading">
+        <h1>সকল বিভাগ</h1>
+        <p>ইসলামিক লাইফের সকল ফিচার</p>
+      </div>
 
-<section class="screen" id="screen-duas">
-<h1>দোয়া ও জিকির</h1>
-<input id="duaSearch" placeholder="খুঁজুন">
-<select id="duaCategory">
-<option value="all">সব</option>
-<option value="daily">দৈনন্দিন</option>
-<option value="morning">সকাল-সন্ধ্যা</option>
-</select>
-<div id="duaList"></div>
-</section>
+      <div class="menu-grid">
+        <button class="feature-card" data-screen="prayer">🕌<strong>নামাজ ও আজান</strong></button>
+        <button class="feature-card" data-screen="quran">📖<strong>আল-কুরআন</strong></button>
+        <button class="feature-card" data-screen="duas">🤲<strong>দোয়া ও জিকির</strong></button>
+        <button class="feature-card" data-screen="hadith">📚<strong>হাদিস</strong></button>
+        <button class="feature-card" data-screen="history">🏛️<strong>ইসলামের ইতিহাস</strong></button>
+        <button class="feature-card" data-screen="prophets">🌟<strong>নবী ও রাসুল</strong></button>
+        <button class="feature-card" data-screen="companions">👥<strong>সাহাবিগণ</strong></button>
+        <button class="feature-card" data-screen="calendar">🌙<strong>হিজরি ক্যালেন্ডার</strong></button>
+        <button class="feature-card" data-screen="ramadan">🌙<strong>রমজান</strong></button>
+        <button class="feature-card" data-screen="qibla">🧭<strong>কিবলা</strong></button>
+        <button class="feature-card" data-screen="tasbih">📿<strong>তাসবিহ</strong></button>
+        <button class="feature-card" data-screen="amal">✨<strong>দৈনিক আমল</strong></button>
+        <button class="feature-card" data-screen="zakat">💰<strong>যাকাত</strong></button>
+        <button class="feature-card" data-screen="quiz">🧠<strong>ইসলামিক কুইজ</strong></button>
+        <button class="feature-card" data-screen="mosques">🕌<strong>মসজিদ খুঁজুন</strong></button>
+        <button class="feature-card" data-screen="saved">🔖<strong>সংরক্ষিত</strong></button>
+      </div>
+    </section>
 
-<section class="screen" id="screen-hadith">
-<h1>হাদিস</h1>
-<div id="hadithInfo"></div>
-</section>
+    <!-- PRAYER -->
+    <section id="screen-prayer" class="screen">
+      <div class="page-heading">
+        <h1>🕌 নামাজ ও আজান</h1>
+        <p>আপনার শহরের নামাজের সময়সূচি</p>
+      </div>
 
-<section class="screen" id="screen-history">
-<h1>ইসলামের ইতিহাস</h1>
-<div id="historyList"></div>
-<p class="notice">ঐতিহাসিক বর্ণনা কুরআন-হাদিসের সমতুল্য নয়; বিভিন্ন উৎসে মতভেদ থাকতে পারে।</p>
-</section>
+      <div class="content-card">
+        <label for="prayerCity">শহরের নাম</label>
+        <input id="prayerCity" type="text" value="Dhaka" placeholder="যেমন: Dhaka">
 
-<section class="screen" id="screen-prophets">
-<h1>নবী ও রাসুল</h1>
-<div id="prophetList"></div>
-</section>
+        <button id="prayerBtn" class="primary-btn" type="button">নামাজের সময় দেখুন</button>
+        <p id="prayerInfo" aria-live="polite"></p>
+      </div>
 
-<section class="screen" id="screen-companions">
-<h1>সাহাবিগণ</h1>
-<div id="companionList"></div>
-</section>
+      <div id="prayerCards" class="prayer-list"></div>
 
-<section class="screen" id="screen-calendar">
-<h1>হিজরি ক্যালেন্ডার</h1>
-<button id="hijriBtnFull">আজকের হিজরি তারিখ</button>
-<div id="hijriInfo"></div>
-</section>
+      <div class="content-card">
+        <h2>আজান নোটিফিকেশন পছন্দ</h2>
 
-<section class="screen" id="screen-ramadan">
-<h1>রমজান</h1>
-<input id="ramadanCity" value="Dhaka">
-<button id="ramadanBtn">সময়সূচি</button>
-<div id="ramadanInfo"></div>
-</section>
+        <label><input type="checkbox" data-prayer-notify="Fajr"> ফজর</label>
+        <label><input type="checkbox" data-prayer-notify="Dhuhr"> যোহর</label>
+        <label><input type="checkbox" data-prayer-notify="Asr"> আসর</label>
+        <label><input type="checkbox" data-prayer-notify="Maghrib"> মাগরিব</label>
+        <label><input type="checkbox" data-prayer-notify="Isha"> এশা</label>
 
-<section class="screen" id="screen-qibla">
-<h1>কিবলা কম্পাস</h1>
-<div id="compass">🕋<div id="compassNeedle">▲</div></div>
-<h2 id="qiblaDegree">—°</h2>
-<button id="qiblaBtn">কিবলার দিক নির্ণয়</button>
-</section>
+        <label for="azanReminder">রিমাইন্ডার</label>
+        <select id="azanReminder">
+          <option value="0">নামাজের সময়</option>
+          <option value="5">৫ মিনিট আগে</option>
+          <option value="10">১০ মিনিট আগে</option>
+        </select>
 
-<section class="screen" id="screen-tasbih">
-<h1>তাসবিহ</h1>
-<div id="tasbihCount">0</div>
-<button id="tasbihBtn">গণনা করুন</button>
-<button id="resetBtn">রিসেট</button>
-</section>
+        <button id="saveAzanPrefs" class="primary-btn" type="button">
+          পছন্দ সংরক্ষণ
+        </button>
 
-<section class="screen" id="screen-amal">
-<h1>দৈনিক আমল</h1>
-<p id="amalProgress"></p>
-<div class="bar"><div id="amalProgressBar"></div></div>
-<div class="panel">
-<label><input class="amal-check" type="checkbox"> পাঁচ ওয়াক্ত নামাজ</label>
-<label><input class="amal-check" type="checkbox"> কুরআন তিলাওয়াত</label>
-<label><input class="amal-check" type="checkbox"> সকাল-সন্ধ্যার জিকির</label>
-<label><input class="amal-check" type="checkbox"> দরুদ পাঠ</label>
-<label><input class="amal-check" type="checkbox"> সদকা / ভালো কাজ</label>
-</div>
-</section>
+        <button id="azanNotifyBtn" class="secondary-btn" type="button">
+          নোটিফিকেশন অনুমতি দিন
+        </button>
 
-<section class="screen" id="screen-zakat">
-<h1>যাকাত ক্যালকুলেটর</h1>
-<label>সম্পদ<input id="zakatAssets" type="number"></label>
-<label>ঋণ<input id="zakatDebts" type="number"></label>
-<button id="zakatBtn">হিসাব করুন</button>
-<p id="zakatInfo"></p>
-</section>
+        <p id="firebasePushStatus" aria-live="polite"></p>
+      </div>
+    </section>
 
-<section class="screen" id="screen-quiz">
-<h1>ইসলামিক কুইজ</h1>
-<h3 id="quizQuestion">শুরু করুন</h3>
-<div id="quizOptions"></div>
-<p id="quizFeedback"></p>
-<button id="quizStartBtn">শুরু</button>
-<button id="quizNextBtn">পরের প্রশ্ন</button>
-</section>
+    <!-- QURAN -->
+    <section id="screen-quran" class="screen">
+      <div class="page-heading">
+        <h1>📖 আল-কুরআন</h1>
+        <p>পড়ুন, বুঝুন এবং তিলাওয়াত শুনুন</p>
+      </div>
 
-<section class="screen" id="screen-mosques">
-<h1>মসজিদ খুঁজুন</h1>
-<button id="mosqueBtn">Google Maps-এ খুঁজুন</button>
-</section>
+      <div class="content-card">
+        <label for="surahSearch">সূরা খুঁজুন</label>
+        <input id="surahSearch" type="search" placeholder="সূরার নাম লিখুন">
 
-<section class="screen" id="screen-saved">
-<h1>সংরক্ষিত</h1>
-<div id="savedList"></div>
-<div id="bookmarkListSaved"></div>
-</section>
+        <label for="surahSelect">সূরা নির্বাচন</label>
+        <select id="surahSelect">
+          <option value="">সূরা নির্বাচন</option>
+        </select>
 
-<section class="screen" id="screen-profile">
-<h1>প্রোফাইল</h1>
-<label>নাম<input id="profileName"></label>
-<label>শহর<input id="profileCity" value="Dhaka"></label>
-<button id="saveProfileBtn">সংরক্ষণ</button>
-<p id="profileMessage"></p>
+        <button id="quranBtn" class="primary-btn" type="button">
+          সূরা পড়ুন
+        </button>
+      </div>
 
-<h3>Firebase অ্যাকাউন্ট</h3>
-<input id="authEmail" type="email" placeholder="ইমেইল">
-<input id="authPassword" type="password" placeholder="পাসওয়ার্ড">
-<button id="signInBtn">লগইন</button>
-<button id="signUpBtn">অ্যাকাউন্ট খুলুন</button>
-<p id="authStatus"></p>
-<div id="dailySummary"></div>
+      <div id="quranInfo" class="quran-content" aria-live="polite"></div>
 
-<button id="creatorBtn">নির্মাতা পরিচিতি</button>
-</section>
+      <div class="content-card">
+        <h2>তিলাওয়াত শুনুন</h2>
+        <p id="audioTitle">সূরা নির্বাচন করুন</p>
+        <audio id="quranAudio" controls preload="none"></audio>
+        <button id="playSurahBtn" class="secondary-btn" type="button">
+          তিলাওয়াত চালু করুন
+        </button>
+      </div>
 
-</main>
+      <div class="content-card">
+        <h2>সংরক্ষিত আয়াত</h2>
+        <div id="bookmarkList"></div>
+      </div>
+    </section>
 
-<nav>
-<button data-screen="home">⌂<small>হোম</small></button>
-<button data-screen="menu">▦<small>মেনু</small></button>
-<button data-screen="quran">۞<small>কুরআন</small></button>
-<button data-screen="saved">♡<small>সংরক্ষিত</small></button>
-<button data-screen="profile">◉<small>প্রোফাইল</small></button>
-</nav>
+    <!-- DUAS -->
+    <section id="screen-duas" class="screen">
+      <div class="page-heading">
+        <h1>🤲 দোয়া ও জিকির</h1>
+      </div>
 
-</div>
+      <input id="duaSearch" type="search" placeholder="দোয়া খুঁজুন">
 
-<div id="creatorModal">
-<div class="creator-card">
-<button id="closeCreatorBtn">×</button>
+      <select id="duaCategory">
+        <option value="all">সব দোয়া</option>
+        <option value="daily">দৈনন্দিন</option>
+        <option value="morning">সকাল-সন্ধ্যা</option>
+      </select>
 
-<img
-src="./creator.jpg"
-alt="Rayhan Imtiaz"
-style="width:130px;height:130px;object-fit:cover;border-radius:50%;display:block;margin:20px auto;border:4px solid #c9a64b;"
->
+      <div id="duaList"></div>
+    </section>
 
-<h2>Rayhan Imtiaz</h2>
-<p><strong>Founder & Creator</strong></p>
+    <!-- HADITH -->
+    <section id="screen-hadith" class="screen">
+      <div class="page-heading">
+        <h1>📚 হাদিস</h1>
+        <p>নির্ভরযোগ্য হাদিস থেকে শিক্ষা</p>
+      </div>
+      <div id="hadithInfo"></div>
+    </section>
 
-<h3>আমি মুসলিম | Islamic Life</h3>
-<p>জ্ঞান, ইবাদত ও উপকারী প্রযুক্তির উদ্যোগ।</p>
-</div>
-</div>
+    <!-- HISTORY -->
+    <section id="screen-history" class="screen">
+      <div class="page-heading">
+        <h1>🏛️ ইসলামের ইতিহাস</h1>
+      </div>
+      <div id="historyList"></div>
+    </section>
 
-<script src="./firebase-config.js"></script>
-<script src="./app.js" defer></script>
-<script type="module" src="./firebase-push.js"></script>
+    <!-- PROPHETS -->
+    <section id="screen-prophets" class="screen">
+      <div class="page-heading">
+        <h1>🌟 নবী ও রাসুল</h1>
+        <p>কুরআনে উল্লেখিত ২৫ জন নবীর নাম</p>
+      </div>
+      <div id="prophetList"></div>
+    </section>
+
+    <!-- COMPANIONS -->
+    <section id="screen-companions" class="screen">
+      <div class="page-heading">
+        <h1>👥 সাহাবিগণ</h1>
+      </div>
+      <div id="companionList"></div>
+    </section>
+
+    <!-- CALENDAR -->
+    <section id="screen-calendar" class="screen">
+      <div class="page-heading">
+        <h1>🌙 হিজরি ক্যালেন্ডার</h1>
+      </div>
+
+      <div class="content-card">
+        <h2>আজকের হিজরি তারিখ</h2>
+        <p id="hijriInfo" aria-live="polite">লোড হচ্ছে...</p>
+        <button id="hijriBtnFull" class="primary-btn" type="button">
+          তারিখ আপডেট করুন
+        </button>
+      </div>
+    </section>
+
+    <!-- RAMADAN -->
+    <section id="screen-ramadan" class="screen">
+      <div class="page-heading">
+        <h1>🌙 রমজান</h1>
+        <p>সেহরি ও ইফতারের সময়সূচি</p>
+      </div>
+
+      <div class="content-card">
+        <label for="ramadanCity">শহর</label>
+        <input id="ramadanCity" type="text" value="Dhaka">
+        <button id="ramadanBtn" class="primary-btn" type="button">
+          সময়সূচি দেখুন
+        </button>
+      </div>
+
+      <div id="ramadanInfo"></div>
+    </section>
+
+    <!-- QIBLA -->
+    <section id="screen-qibla" class="screen">
+      <div class="page-heading">
+        <h1>🧭 কিবলা কম্পাস</h1>
+        <p>কাবা শরিফের দিক নির্ণয় করুন</p>
+      </div>
+
+      <div class="content-card qibla-card">
+        <div id="compass" class="compass">
+          <div class="compass-mark">N</div>
+          <div id="compassNeedle" class="compass-needle"></div>
+          <div class="compass-center">☪</div>
+        </div>
+
+        <p id="qiblaDegree">--°</p>
+
+        <button id="qiblaBtn" class="primary-btn" type="button">
+          কিবলার দিক নির্ণয় করুন
+        </button>
+
+        <p>কম্পাসের জন্য লোকেশন অনুমতি প্রয়োজন।</p>
+      </div>
+    </section>
+
+    <!-- TASBIH -->
+    <section id="screen-tasbih" class="screen">
+      <div class="page-heading">
+        <h1>📿 ডিজিটাল তাসবিহ</h1>
+      </div>
+
+      <div class="content-card tasbih-card">
+        <p>আপনার জিকির গণনা</p>
+        <h1 id="tasbihCount">০</h1>
+
+        <button id="tasbihBtn" class="tasbih-button" type="button">
+          📿 গণনা করুন
+        </button>
+
+        <button id="resetBtn" class="secondary-btn" type="button">
+          রিসেট
+        </button>
+      </div>
+    </section>
+
+    <!-- AMAL -->
+    <section id="screen-amal" class="screen">
+      <div class="page-heading">
+        <h1>✨ দৈনিক আমল</h1>
+        <p>প্রতিদিনের ভালো কাজের হিসাব রাখুন</p>
+      </div>
+
+      <div class="content-card">
+        <h2>আজকের অগ্রগতি</h2>
+        <p id="amalProgress">০/৫ সম্পন্ন</p>
+        <div class="progress-track">
+          <div id="amalProgressBar" class="progress-bar"></div>
+        </div>
+      </div>
+
+      <div class="content-card amal-list">
+        <label><input type="checkbox" class="amal-check"> পাঁচ ওয়াক্ত নামাজ</label>
+        <label><input type="checkbox" class="amal-check"> কুরআন তিলাওয়াত</label>
+        <label><input type="checkbox" class="amal-check"> সকাল-সন্ধ্যার জিকির</label>
+        <label><input type="checkbox" class="amal-check"> দরুদ পাঠ</label>
+        <label><input type="checkbox" class="amal-check"> সদকা / ভালো কাজ</label>
+      </div>
+    </section>
+
+    <!-- ZAKAT -->
+    <section id="screen-zakat" class="screen">
+      <div class="page-heading">
+        <h1>💰 যাকাত ক্যালকুলেটর</h1>
+        <p>আনুমানিক যাকাত হিসাব করুন</p>
+      </div>
+
+      <div class="content-card">
+        <label for="zakatAssets">মোট যাকাতযোগ্য সম্পদ (টাকা)</label>
+        <input id="zakatAssets" type="number" min="0" placeholder="যেমন: 500000">
+
+        <label for="zakatDebts">বাদযোগ্য ঋণ (টাকা)</label>
+        <input id="zakatDebts" type="number" min="0" placeholder="যেমন: 50000">
+
+        <button id="zakatBtn" class="primary-btn" type="button">
+          যাকাত হিসাব করুন
+        </button>
+
+        <p id="zakatInfo" aria-live="polite"></p>
+      </div>
+
+      <div class="content-card">
+        <p>
+          সাধারণ হিসাবের হার ২.৫%। প্রকৃত যাকাত নির্ধারণের জন্য নিসাব,
+          হাওল, সম্পদের ধরন ও প্রযোজ্য ফিকহি বিধান যাচাই করুন।
+        </p>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="screen-quiz" class="screen">
+      <div class="page-heading">
+        <h1>🧠 ইসলামিক কুইজ</h1>
+        <p>ইসলাম সম্পর্কে নিজের জ্ঞান যাচাই করুন</p>
+      </div>
+
+      <div class="content-card">
+        <h2 id="quizQuestion">প্রস্তুত?</h2>
+        <div id="quizOptions"></div>
+        <p id="quizFeedback" aria-live="polite"></p>
+
+        <button id="quizStartBtn" class="primary-btn" type="button">
+          শুরু করুন
+        </button>
+
+        <button id="quizNextBtn" class="secondary-btn" type="button">
+          পরের প্রশ্ন
+        </button>
+      </div>
+    </section>
+
+    <!-- MOSQUES -->
+    <section id="screen-mosques" class="screen">
+      <div class="page-heading">
+        <h1>🕌 মসজিদ খুঁজুন</h1>
+        <p>আপনার কাছাকাছি মসজিদ খুঁজে দেখুন</p>
+      </div>
+
+      <div class="content-card">
+        <button id="mosqueBtn" class="primary-btn" type="button">
+          Google Maps-এ মসজিদ খুঁজুন
+        </button>
+      </div>
+    </section>
+
+    <!-- SAVED -->
+    <section id="screen-saved" class="screen">
+      <div class="page-heading">
+        <h1>🔖 সংরক্ষিত আয়াত</h1>
+        <p>আপনার সংরক্ষণ করা আয়াতগুলো এখানে থাকবে</p>
+      </div>
+      <div id="savedList"></div>
+      <div id="bookmarkListSaved"></div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="screen-profile" class="screen">
+      <div class="page-heading">
+        <h1>👤 প্রোফাইল</h1>
+        <p>আপনার ব্যক্তিগত তথ্য</p>
+      </div>
+
+      <div class="content-card">
+        <label for="profileName">আপনার নাম</label>
+        <input id="profileName" type="text" placeholder="আপনার নাম লিখুন">
+
+        <label for="profileCity">আপনার শহর</label>
+        <input id="profileCity" type="text" placeholder="Dhaka">
+
+        <button id="saveProfileBtn" class="primary-btn" type="button">
+          প্রোফাইল সংরক্ষণ
+        </button>
+
+        <p id="profileMessage" aria-live="polite"></p>
+      </div>
+
+      <div class="content-card">
+        <h2>অ্যাকাউন্ট</h2>
+
+        <label for="authEmail">ইমেইল</label>
+        <input id="authEmail" type="email" placeholder="name@example.com">
+
+        <label for="authPassword">পাসওয়ার্ড</label>
+        <input id="authPassword" type="password" placeholder="পাসওয়ার্ড">
+
+        <button id="signInBtn" class="primary-btn" type="button">
+          লগইন
+        </button>
+
+        <button id="signUpBtn" class="secondary-btn" type="button">
+          অ্যাকাউন্ট খুলুন
+        </button>
+
+        <p id="authStatus"></p>
+      </div>
+
+      <div class="content-card">
+        <h2>আজকের সারাংশ</h2>
+        <p id="dailySummary">আজকের আমলের অগ্রগতি এখানে দেখাবে।</p>
+      </div>
+
+      <div class="content-card creator-preview">
+        <h2>অ্যাপ নির্মাতা</h2>
+
+        <div class="creator-mini">
+          <img src="./creator.jpg" alt="Rayhan Imtiaz">
+          <div>
+            <h3>Rayhan Imtiaz</h3>
+            <p>Founder & Creator</p>
+          </div>
+        </div>
+
+        <button id="creatorBtn" class="secondary-btn" type="button">
+          নির্মাতা পরিচিতি
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAVIGATION -->
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <button type="button" data-screen="home" class="active">
+      <span>⌂</span>
+      <small>হোম</small>
+    </button>
+
+    <button type="button" data-screen="menu">
+      <span>▦</span>
+      <small>মেনু</small>
+    </button>
+
+    <button type="button" data-screen="quran">
+      <span>📖</span>
+      <small>কুরআন</small>
+    </button>
+
+    <button type="button" data-screen="saved">
+      <span>🔖</span>
+      <small>সংরক্ষিত</small>
+    </button>
+
+    <button type="button" data-screen="profile">
+      <span>👤</span>
+      <small>প্রোফাইল</small>
+    </button>
+  </nav>
+
+  <!-- CREATOR MODAL -->
+  <div id="creatorModal" class="modal" role="dialog" aria-modal="true"
+       aria-labelledby="creatorName">
+
+    <div class="modal-content creator-modal-content">
+
+      <button id="closeCreatorBtn" class="modal-close" type="button"
+              aria-label="Close">×</button>
+
+      <div class="creator-profile">
+        <img
+          src="./creator.jpg"
+          alt="Rayhan Imtiaz"
+          class="creator-photo"
+          onerror="this.style.display='none'"
+        >
+
+        <p class="eyebrow">THE CREATOR</p>
+
+        <h2 id="creatorName">Rayhan Imtiaz</h2>
+
+        <p class="creator-role">Founder & Creator</p>
+
+        <div class="creator-divider"></div>
+
+        <h3>আমি মুসলিম | Islamic Life</h3>
+
+        <p>
+          জ্ঞান, ইবাদত ও উপকারী প্রযুক্তির উদ্যোগ।
+        </p>
+
+        <p class="creator-signature">
+          Created with purpose and dedication.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="./firebase-config.js"></script>
+  <script src="./app.js" defer></script>
+  <script src="./firebase-push.js" type="module"></script>
 
 </body>
 </html>
