@@ -9,3 +9,295 @@ let count=get("im-muslim-tasbih",0);$("#tasbihCount").textContent=count;$("#tasb
 let ak="il-amal-"+new Date().toISOString().slice(0,10),amal=get(ak,[]);$$(".amal-check").forEach((x,i)=>{x.checked=!!amal[i];x.onchange=()=>{amal=$$(".amal-check").map(y=>y.checked);set(ak,amal);renderAmal()}});function renderAmal(){let n=amal.filter(Boolean).length;$("#amalProgress").textContent=`${n}/5 সম্পন্ন` ;$("#amalProgressBar").style.width=(n/5*100)+"%";$("#dailySummary").textContent=`আজ ${n}টি আমল সম্পন্ন।`}renderAmal();$("#zakatBtn").onclick=()=>{let net=Math.max(0,(+$("#zakatAssets").value||0)-(+$("#zakatDebts").value||0));$("#zakatInfo").textContent=`নিট সম্পদ ৳${net.toLocaleString("en-BD")} · আনুমানিক যাকাত ২.৫% = ৳${(net*.025).toLocaleString("en-BD")}. নিসাব, হাওল ও সম্পদের ধরন যাচাই করুন।`};
 let quiz=[["কুরআনের প্রথম অবতীর্ণ আয়াত কোন সূরায়?",["ফাতিহা","আল-আলাক","ইখলাস"],1,"সূরা আল-আলাক ৯৬:১–৫"],["কিবলা কোনটি?",["কাবা","মসজিদে নববি","মসজিদুল আকসা"],0,"কাবা শরিফ"]],qi=0;function drawQuiz(){let q=quiz[qi];$("#quizQuestion").textContent=q[0];$("#quizOptions").innerHTML=q[1].map((x,i)=>`<button data-ans="${i}">${x}</button>`).join("")}$("#quizStartBtn").onclick=()=>{qi=0;drawQuiz()};$("#quizNextBtn").onclick=()=>{qi=(qi+1)%quiz.length;drawQuiz()};$("#quizOptions").onclick=e=>{let b=e.target.closest("[data-ans]");if(!b)return;let q=quiz[qi];$("#quizFeedback").textContent=+b.dataset.ans===q[2]?"সঠিক! "+q[3]:"সঠিক উত্তর: "+q[1][q[2]];$$("[data-ans]").forEach(x=>x.disabled=true)};$("#mosqueBtn").onclick=()=>window.open("https://www.google.com/maps/search/mosque+near+me/","_blank","noopener");$("#languageSelect").onchange=()=>{if($("#languageSelect").value==="en")alert("এই সংস্করণের মূল ভাষা বাংলা; পূর্ণ English localization পরবর্তী কনটেন্ট কাজ।")};if("serviceWorker"in navigator&&location.protocol.startsWith("http"))addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 })();
+
+/* ==========================================
+   নতুন আপডেট: Navigation + বাংলা/English
+   + Saved Ayat
+   ========================================== */
+
+const EXTRA_STORE = {
+  language: "im-muslim-language"
+};
+
+/* ১. বাংলা ও ইংরেজি অনুবাদ */
+const translations = {
+  "আসসালামু আলাইকুম": "Assalamu Alaikum",
+  "আপনার প্রতিদিনের": "Your Daily",
+  "ইসলামিক সঙ্গী": "Islamic Companion",
+  "পরবর্তী নামাজ": "Next Prayer",
+  "নামাজের সময়": "Prayer Times",
+  "শহর অনুযায়ী সময় দেখুন": "View prayer times by city",
+  "সকল বিভাগ": "All Categories",
+  "হোম": "Home",
+  "মেনু": "Menu",
+  "কুরআন": "Quran",
+  "আল-কুরআন": "The Holy Quran",
+  "নামাজ ও আজান": "Prayer & Adhan",
+  "দোয়া ও জিকির": "Duas & Dhikr",
+  "হাদিস": "Hadith",
+  "ইসলামের ইতিহাস": "Islamic History",
+  "নবী ও রাসুল": "Prophets & Messengers",
+  "নবী-রাসুল": "Prophets",
+  "সাহাবিগণ": "Companions",
+  "হিজরি ক্যালেন্ডার": "Hijri Calendar",
+  "রমজান": "Ramadan",
+  "কিবলা": "Qibla",
+  "কিবলা কম্পাস": "Qibla Compass",
+  "তাসবিহ": "Tasbih",
+  "দৈনিক আমল": "Daily Deeds",
+  "আমল": "Daily Deeds",
+  "যাকাত": "Zakat",
+  "যাকাত ক্যালকুলেটর": "Zakat Calculator",
+  "ইসলামিক কুইজ": "Islamic Quiz",
+  "মসজিদ খুঁজুন": "Find a Mosque",
+  "মসজিদ": "Mosques",
+  "সংরক্ষিত": "Saved",
+  "প্রোফাইল": "Profile",
+  "নামাজের সময়": "Prayer Times",
+  "সময় দেখুন": "Show Times",
+  "শহর": "City",
+  "আজানের নোটিফিকেশন": "Adhan Notifications",
+  "ঠিক সময়ে": "At prayer time",
+  "৫ মিনিট আগে": "5 minutes before",
+  "১০ মিনিট আগে": "10 minutes before",
+  "পছন্দ সংরক্ষণ": "Save Preferences",
+  "নোটিফিকেশন চালু করুন": "Enable Notifications",
+  "সূরা নির্বাচন": "Select Surah",
+  "পড়ুন": "Read",
+  "সূরা খুঁজুন": "Search Surah",
+  "তিলাওয়াত": "Recitation",
+  "শুনুন": "Listen",
+  "দোয়া ও জিকির": "Duas & Dhikr",
+  "খুঁজুন": "Search",
+  "সব": "All",
+  "দৈনন্দিন": "Daily",
+  "সকাল-সন্ধ্যা": "Morning & Evening",
+  "আজকের হিজরি তারিখ": "Today's Hijri Date",
+  "সময়সূচি": "Schedule",
+  "কিবলার দিক নির্ণয়": "Find Qibla Direction",
+  "গণনা করুন": "Count",
+  "রিসেট": "Reset",
+  "পাঁচ ওয়াক্ত নামাজ": "Five Daily Prayers",
+  "কুরআন তিলাওয়াত": "Quran Recitation",
+  "সকাল-সন্ধ্যার জিকির": "Morning & Evening Dhikr",
+  "দরুদ পাঠ": "Send Blessings",
+  "সদকা / ভালো কাজ": "Charity / Good Deeds",
+  "সম্পদ": "Assets",
+  "ঋণ": "Debts",
+  "হিসাব করুন": "Calculate",
+  "শুরু করুন": "Start",
+  "শুরু": "Start",
+  "পরের প্রশ্ন": "Next Question",
+  "Google Maps-এ খুঁজুন": "Find on Google Maps",
+  "নাম": "Name",
+  "সংরক্ষণ": "Save",
+  "লগইন": "Log In",
+  "অ্যাকাউন্ট খুলুন": "Create Account",
+  "ইমেইল": "Email",
+  "পাসওয়ার্ড": "Password",
+  "নির্মাতা পরিচিতি": "About the Creator",
+  "Founder & Creator": "Founder & Creator",
+  "জ্ঞান, ইবাদত ও উপকারী প্রযুক্তির উদ্যোগ।": "An initiative for knowledge, worship and useful technology.",
+  "বাংলা উচ্চারণ": "Pronunciation",
+  "অর্থ": "Meaning",
+  "উৎস": "Source",
+  "আয়াত সংরক্ষণ": "Save Ayah",
+  "আরবি কপি": "Copy Arabic",
+  "সংরক্ষণ থেকে সরান": "Remove from Saved",
+  "কোনো দোয়া পাওয়া যায়নি।": "No dua found.",
+  "কোনো সূরা পাওয়া যায়নি": "No Surah found",
+  "প্রথমে একটি সূরা নির্বাচন করুন।": "Please select a Surah first.",
+  "কপি করা হয়েছে।": "Copied successfully.",
+  "কপি করা যায়নি।": "Could not copy.",
+  "এখনো কোনো আয়াত সংরক্ষণ করা হয়নি।": "No ayahs saved yet.",
+  "তারিখ": "Date",
+  "নির্মাতা": "Creator",
+  "পরবর্তী নামাজ": "Next Prayer"
+};
+
+/* ২. ভাষা সংরক্ষণ */
+let appLanguage = localStorage.getItem(EXTRA_STORE.language) || "bn";
+
+function translatePage() {
+  const isEnglish = appLanguage === "en";
+
+  document.documentElement.lang = appLanguage;
+
+  // সাধারণ লেখা অনুবাদ
+  const walker = document.createTreeWalker(
+    document.body,
+    NodeFilter.SHOW_TEXT
+  );
+
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+
+  nodes.forEach(node => {
+    const original = node.textContent;
+    const trimmed = original.trim();
+
+    if (!trimmed) return;
+
+    if (isEnglish && translations[trimmed]) {
+      node.textContent = original.replace(
+        trimmed,
+        translations[trimmed]
+      );
+    } else if (!isEnglish) {
+      const englishToBangla = Object.fromEntries(
+        Object.entries(translations).map(([bn, en]) => [en, bn])
+      );
+
+      if (englishToBangla[trimmed]) {
+        node.textContent = original.replace(
+          trimmed,
+          englishToBangla[trimmed]
+        );
+      }
+    }
+  });
+
+  // ইনপুটের placeholder
+  document.querySelectorAll("input, textarea").forEach(input => {
+    const value = input.getAttribute("placeholder");
+    if (!value) return;
+
+    if (isEnglish && translations[value]) {
+      input.dataset.bnPlaceholder = value;
+      input.placeholder = translations[value];
+    } else if (!isEnglish && input.dataset.bnPlaceholder) {
+      input.placeholder = input.dataset.bnPlaceholder;
+    }
+  });
+
+  // ইংরেজিতে সংখ্যা
+  if (isEnglish) {
+    document.querySelectorAll("#tasbihCount, #amalProgress").forEach(el => {
+      el.textContent = el.textContent.replace(/[০-৯]/g, d =>
+        "০১২৩৪৫৬৭৮৯".indexOf(d)
+      );
+    });
+  }
+}
+
+/* ৩. ভাষা পরিবর্তনের বোতাম */
+function setupLanguage() {
+  const select = document.getElementById("languageSelect");
+  if (!select) return;
+
+  select.value = appLanguage;
+  translatePage();
+
+  select.addEventListener("change", () => {
+    appLanguage = select.value;
+    localStorage.setItem(EXTRA_STORE.language, appLanguage);
+    translatePage();
+  });
+}
+
+/* ৪. পেজ নেভিগেশন */
+function setupNavigation() {
+  const buttons = document.querySelectorAll("[data-screen]");
+  const screens = document.querySelectorAll(".screen");
+
+  buttons.forEach(button => {
+    button.addEventListener("click", () => {
+      const target = button.dataset.screen;
+
+      screens.forEach(screen => {
+        screen.classList.toggle(
+          "active",
+          screen.id === "screen-" + target
+        );
+      });
+
+      document.querySelectorAll("nav [data-screen]").forEach(navButton => {
+        navButton.classList.toggle(
+          "active",
+          navButton.dataset.screen === target
+        );
+      });
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+      if (target === "saved") {
+        renderSavedPage();
+      }
+
+      if (target === "hadith") {
+        showHadith();
+      }
+    });
+  });
+}
+
+/* ৫. সংরক্ষিত আয়াত আলাদা পেজেও দেখানো */
+function renderSavedPage() {
+  const list = $("bookmarkListSaved");
+  if (!list) return;
+
+  list.replaceChildren();
+
+  if (!bookmarkData.length) {
+    list.appendChild(makeNode(
+      "p",
+      appLanguage === "en"
+        ? "No saved ayahs yet."
+        : "এখনো কোনো আয়াত সংরক্ষণ করা হয়নি।",
+      "muted"
+    ));
+    return;
+  }
+
+  bookmarkData.forEach((item, index) => {
+    const card = makeNode("article", undefined, "content-card");
+
+    card.appendChild(makeNode(
+      "h3",
+      `${item.surahName || "সূরা"} — ${appLanguage === "en" ? "Ayah" : "আয়াত"} ${item.ayah}`
+    ));
+
+    card.appendChild(makeNode("p", item.arabic || "", "arabic-text"));
+
+    if (item.bangla) {
+      card.appendChild(makeNode("p", item.bangla));
+    }
+
+    addButton(
+      card,
+      appLanguage === "en" ? "Remove" : "সংরক্ষণ থেকে সরান",
+      () => {
+        bookmarkData.splice(index, 1);
+        writeStore(STORE.bookmarks, bookmarkData);
+        renderSavedPage();
+        renderBookmarks();
+      }
+    );
+
+    list.appendChild(card);
+  });
+}
+
+/* ৬. আগের bookmark render-এর সঙ্গে Saved page যুক্ত */
+const originalRenderBookmarks = renderBookmarks;
+
+renderBookmarks = function () {
+  originalRenderBookmarks();
+  renderSavedPage();
+};
+
+/* ৭. নেভিগেশন ও ভাষা চালু */
+function initExtraFeatures() {
+  setupNavigation();
+  setupLanguage();
+  renderSavedPage();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initExtraFeatures);
+} else {
+  initExtraFeatures();
+}
