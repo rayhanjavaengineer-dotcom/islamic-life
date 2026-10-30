@@ -72,8 +72,23 @@
       </div>
       <div id="prayerInfo" class="result-box" aria-live="polite">নামাজের সময় লোড হচ্ছে…</div>
       <div id="prayerCards" class="prayer-cards" aria-live="polite"></div>
-      <div class="button-row"><button id="azanNotifyBtn" class="secondary-btn" type="button">🔔 আযান নোটিফিকেশন চালু</button><button id="refreshPrayerBtn" class="secondary-btn" type="button">↻ সময় আপডেট</button></div>
-      <p class="note">নোটিফিকেশন কেবল অনুমোদিত ও খোলা অ্যাপ/ব্রাউজারের উপযোগী পরিবেশে কাজ করতে পারে; বন্ধ থাকা অবস্থায় নির্ভরযোগ্য ব্যাকগ্রাউন্ড আযান নিশ্চিত নয়।</p>
+      <div class="button-row"><button id="azanNotifyBtn" class="secondary-btn" type="button">🔔 Firebase নোটিফিকেশন সেটআপ</button><button id="refreshPrayerBtn" class="secondary-btn" type="button">↻ সময় আপডেট</button></div>
+      <div class="azan-settings">
+        <h3>নামাজের নোটিফিকেশন পছন্দ</h3>
+        <p class="muted">যে ওয়াক্তগুলোর জন্য স্মরণ করাতে চাও সেগুলো নির্বাচন করো।</p>
+        <div class="azan-toggle-grid">
+          <label><input type="checkbox" data-prayer-notify="Fajr" checked> ফজর</label>
+          <label><input type="checkbox" data-prayer-notify="Dhuhr" checked> যোহর</label>
+          <label><input type="checkbox" data-prayer-notify="Asr" checked> আসর</label>
+          <label><input type="checkbox" data-prayer-notify="Maghrib" checked> মাগরিব</label>
+          <label><input type="checkbox" data-prayer-notify="Isha" checked> এশা</label>
+        </div>
+        <label class="azan-choice">রিমাইন্ডার <select id="azanReminder"><option value="0">নামাজের সময়</option><option value="5">৫ মিনিট আগে</option><option value="10">১০ মিনিট আগে</option></select></label>
+        <label class="azan-choice">সাউন্ড <select id="azanSound"><option value="both">নোটিফিকেশন + আজান অডিও (সমর্থিত হলে)</option><option value="notification">শুধু নোটিফিকেশন সাউন্ড</option><option value="silent">নীরব নোটিফিকেশন</option></select></label>
+        <button id="saveAzanPrefs" class="secondary-btn" type="button">পছন্দ সংরক্ষণ</button>
+        <p id="firebasePushStatus" class="note" aria-live="polite">Firebase project configuration না দেওয়া পর্যন্ত ব্যাকগ্রাউন্ড Push চালু হবে না।</p>
+      </div>
+      <p class="note">গুরুত্বপূর্ণ: Firebase Push-এর জন্য Firebase project, Web App config, VAPID public key এবং নিরাপদ server-side sender/Cloud Function প্রয়োজন। Android/Chrome-এর background notification sound OS নিয়ন্ত্রণ করে; সম্পূর্ণ আজান অডিও ব্যাকগ্রাউন্ডে সব ফোনে নিশ্চিত করা যায় না।</p>
     </section>
 
     <section id="niyat" class="section-block panel">
@@ -277,5 +292,6 @@
   </footer>
 
   <script src="app.js" defer></script>
+  <script type="module" src="firebase-push.js"></script>
 </body>
 </html>
