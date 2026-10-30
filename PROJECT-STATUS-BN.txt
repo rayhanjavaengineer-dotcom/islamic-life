@@ -1,0 +1,1 @@
+এই ZIP একটি নতুন responsive PWA frontend build. আগের Firebase config ও VAPID key এখানে নেই; তোমার পুরোনো firebase-config.js থেকে আসল মান কপি করো। পুরোনো icon-192.png, icon-512.png ও creator.jpg রেখে দাও। Production Push scheduler, Firestore rules, পূর্ণ Phone OTP, পূর্ণ English translation এবং বিস্তৃত উৎস-নির্ভর ইতিহাস আলাদা backend/content কাজ ও বাস্তব পরীক্ষা চায়।
