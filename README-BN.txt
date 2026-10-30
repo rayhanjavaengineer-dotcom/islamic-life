@@ -1,10 +1,17 @@
-আমি মুসলিম | Islamic Life
+ISLAMIC LIFE — GitHub Upload Package
 
-ব্যবহার:
-1) ZIP extract করুন।
-2) public ফোল্ডারের ফাইলগুলো আপনার GitHub repository-এর public ফোল্ডারে আপলোড করুন।
-3) creator.jpg আপাতত অ্যাপের লোগো দিয়ে রাখা হয়েছে। নিজের আসল portrait দিতে public/creator.jpg ফাইলটি বদলে দিন।
-4) Firebase login ও push notification চালু করতে public/firebase-config.js-এ নিজের Firebase project config বসাতে হবে এবং Firebase Authentication/Cloud Messaging সেটআপ করতে হবে।
-5) HTTPS hosting (যেমন Vercel) থেকে চালালে PWA install/service worker কাজ করবে।
+ফোল্ডার কাঠামো:
+- public/ : ওয়েব অ্যাপের সব HTML, CSS, JavaScript, PWA ও Firebase ফাইল
+- এই README: আপলোড নির্দেশনা
 
-গুরুত্বপূর্ণ: Firebase credentials এখানে placeholder; বাস্তব authentication/push কাজ করবে না যতক্ষণ নিজের Firebase config ও backend/FCM setup না করা হয়।
+GitHub-এ আপলোড:
+1. ZIP Extract করুন।
+2. Extract করা islamic-life ফোল্ডারের ভেতরের README-BN.txt এবং public ফোল্ডারসহ সবকিছু GitHub repository-র root-এ আপলোড করুন।
+3. public ফোল্ডারের ভেতরের ফাইলগুলো আলাদা করে repository root-এ সরাবেন না।
+4. ফাইলের নাম/ফোল্ডারের নাম পরিবর্তন করবেন না।
+
+গুরুত্বপূর্ণ:
+- public/creator.jpg হলো Creator ছবির জায়গা। এই প্যাকেজে আসল ব্যক্তিগত ছবি এখনো বসানো হয়নি; সঠিক ছবি পেলে একই নামের creator.jpg দিয়ে প্রতিস্থাপন করুন।
+- public/icon-512.png হলো অ্যাপের আইকন; এটি পরিবর্তন করবেন না।
+- Firebase config ও push notification চালু করতে নিজের Firebase project-এর configuration প্রয়োজন।
+- SMS, login, payment বা server-side সুবিধা আলাদা backend/provider configuration ছাড়া স্বয়ংক্রিয়ভাবে চালু হবে না।
