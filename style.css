@@ -1,159 +1,143 @@
 
+/* =====================================================
+   আমি মুসলিম | ISLAMIC LIFE
+   Premium Emerald Green + Gold UI
+   Responsive: Mobile, Tablet & Desktop
+===================================================== */
+
 :root {
-  --green: #087653;
-  --green-dark: #064432;
-  --green-deep: #032f25;
-  --green-light: #e7f5ed;
-  --gold: #d9b45e;
-  --gold-light: #f8edce;
-  --bg: #f5f8f3;
+  --green-950: #062d25;
+  --green-900: #084436;
+  --green-800: #0b5945;
+  --green-700: #087653;
+  --green-600: #10966a;
+  --green-100: #e6f4ed;
+  --gold: #d5ad55;
+  --gold-light: #f3d994;
+
+  --bg: #f5f8f5;
   --surface: #ffffff;
-  --surface-2: #edf5ef;
-  --text: #19392d;
-  --muted: #718279;
-  --border: #dce9df;
-  --shadow: 0 8px 26px rgba(5, 67, 44, .09);
-  --radius: 20px;
+  --surface-2: #edf4ef;
+  --text: #18342b;
+  --muted: #71847a;
+  --border: #e0e9e2;
+  --shadow: 0 8px 28px rgba(7, 54, 39, 0.08);
+
+  --radius: 18px;
+  --header-height: 72px;
+  --nav-height: 72px;
 }
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 90px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  margin: 0;
   min-height: 100vh;
+  font-family: "Noto Sans Bengali", "Hind Siliguri",
+    system-ui, sans-serif;
+  background: var(--bg);
   color: var(--text);
-  background-color: var(--bg);
-  background-image:
-    radial-gradient(circle at 10% 15%, rgba(217,180,94,.09) 1px, transparent 2px),
-    radial-gradient(circle at 90% 75%, rgba(8,118,83,.06) 1px, transparent 2px),
-    repeating-linear-gradient(45deg, transparent 0 35px, rgba(8,118,83,.025) 36px 37px);
-  font-family: system-ui, -apple-system, "Noto Sans Bengali",
-    "Noto Sans", sans-serif;
-  line-height: 1.7;
-  padding-bottom: 95px;
-  transition: background .25s, color .25s;
+  line-height: 1.65;
+  transition: background .25s ease, color .25s ease;
 }
 
-button, input, select, textarea {
+button,
+input,
+select,
+textarea {
   font: inherit;
-}
-
-button, input, select {
-  -webkit-tap-highlight-color: transparent;
 }
 
 button {
   cursor: pointer;
-  transition: .2s ease;
-}
-
-button:active {
-  transform: scale(.97);
 }
 
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
-  outline: 3px solid var(--gold);
-  outline-offset: 3px;
+  outline: 3px solid rgba(213, 173, 85, .45);
+  outline-offset: 2px;
 }
 
 img {
   max-width: 100%;
+  display: block;
 }
 
-/* Main app layout */
+/* ================= HEADER ================= */
 
-.shell {
-  width: 100%;
-  min-height: 100vh;
-}
-
-header {
-  position: sticky;
-  top: 0;
-  z-index: 50;
+.app-header {
+  min-height: var(--header-height);
+  padding: 12px 5%;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  min-height: 72px;
-  padding: 10px max(16px, calc((100% - 1150px) / 2));
-  background: rgba(255,255,255,.94);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 3px 15px rgba(0,0,0,.035);
-  backdrop-filter: blur(14px);
+  gap: 15px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-header .brand {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 5px 0;
-  border: 0;
+.app-header button {
+  border: none;
+}
+
+.brand,
+.app-header [data-screen="home"] {
+  color: var(--green-800);
   background: transparent;
-  color: var(--green-dark);
-  font-size: 23px;
-  font-weight: 850;
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: -.5px;
 }
 
-header .brand span {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  font-size: 17px;
-  line-height: 1.3;
-}
-
-header .brand small {
-  color: var(--muted);
-  font-size: 9px;
-  letter-spacing: 2px;
-}
-
-header select {
-  display: inline-block;
-  width: auto;
-  min-height: 39px;
-  padding: 5px 9px;
+.app-header select,
+#languageSelect {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 12px;
 }
 
 #darkModeBtn {
-  width: 41px;
-  height: 41px;
-  margin-left: 5px;
-  border: 1px solid var(--border);
-  border-radius: 13px;
   background: var(--surface-2);
-  color: var(--green);
-  font-size: 21px;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 9px 12px;
 }
 
-main {
-  width: min(100% - 30px, 1120px);
-  margin: 24px auto 35px;
+/* ================= MAIN LAYOUT ================= */
+
+.app-main {
+  width: min(1180px, 92%);
+  margin: 26px auto 110px;
 }
 
 .screen {
   display: none;
-  animation: screenIn .25s ease;
+  animation: screenEnter .3s ease;
 }
 
 .screen.active {
   display: block;
 }
 
-@keyframes screenIn {
+@keyframes screenEnter {
   from {
     opacity: 0;
-    transform: translateY(7px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -161,879 +145,865 @@ main {
   }
 }
 
-.screen > h1 {
-  margin: 10px 0 22px;
-  color: var(--green-dark);
-  font-size: clamp(25px, 4vw, 34px);
-  font-weight: 850;
-  line-height: 1.4;
+.screen h1,
+.screen h2,
+.screen h3 {
+  line-height: 1.35;
 }
 
-.screen > h1::after {
-  display: block;
-  width: 55px;
-  height: 4px;
-  margin-top: 9px;
-  border-radius: 5px;
-  background: linear-gradient(90deg, var(--gold), var(--green));
-  content: "";
+.screen h2 {
+  color: var(--green-800);
+  margin-bottom: 18px;
+  font-size: 25px;
 }
 
-/* Home hero */
+.screen h3 {
+  margin-bottom: 10px;
+}
+
+/* ================= HERO ================= */
 
 .hero {
   position: relative;
-  isolation: isolate;
   overflow: hidden;
-  min-height: 275px;
-  padding: clamp(25px, 5vw, 48px);
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 27px;
+  isolation: isolate;
+  padding: 42px 35px;
+  border-radius: 26px;
   color: #fff;
   background:
-    radial-gradient(circle at 85% 25%, rgba(218,184,105,.23), transparent 24%),
-    linear-gradient(130deg, #043b2c 0%, #087653 60%, #0b674b 100%);
-  box-shadow: 0 15px 35px rgba(4,65,44,.18);
+    radial-gradient(circle at 85% 15%, rgba(243,217,148,.22), transparent 25%),
+    linear-gradient(125deg, #06372b, #087653 65%, #0b5945);
+  box-shadow: 0 16px 38px rgba(5, 65, 46, .2);
+  margin-bottom: 25px;
 }
 
 .hero::before {
-  position: absolute;
-  z-index: -1;
-  top: -65px;
-  right: -35px;
-  width: 250px;
-  height: 250px;
-  border: 1px solid rgba(241,211,145,.2);
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 18px rgba(241,211,145,.035),
-    0 0 0 38px rgba(241,211,145,.025);
   content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: .13;
+  background-image:
+    repeating-linear-gradient(45deg, transparent 0 24px, #fff 25px 26px, transparent 27px 50px),
+    repeating-linear-gradient(-45deg, transparent 0 24px, #fff 25px 26px, transparent 27px 50px);
+  mask-image: linear-gradient(90deg, transparent, black);
 }
 
 .hero::after {
+  content: "☾";
   position: absolute;
-  z-index: -1;
-  right: 30px;
-  bottom: -70px;
-  width: 160px;
-  height: 160px;
-  border: 1px solid rgba(255,255,255,.12);
-  transform: rotate(45deg);
-  content: "";
+  right: 7%;
+  top: 5px;
+  color: rgba(243, 217, 148, .22);
+  font-size: clamp(100px, 18vw, 190px);
+  line-height: 1;
+  pointer-events: none;
 }
 
-.hero > small {
-  display: inline-block;
-  color: #f1d38e;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 1px;
-}
-
-.hero h1 {
-  margin: 12px 0;
-  color: white;
-  font-size: clamp(28px, 5vw, 43px);
-  font-weight: 850;
-  line-height: 1.45;
-}
-
+.hero h1,
+.hero h2,
 .hero p {
-  margin: 7px 0;
-  color: #e0f3e9;
-  font-size: 14px;
-}
-
-#todayDate,
-#hijriQuick {
   position: relative;
   z-index: 1;
 }
 
-/* Section headings and panels */
-
-.section {
-  margin: 27px 0;
+.hero h1 {
+  font-size: clamp(27px, 4vw, 42px);
+  font-weight: 900;
+  margin-bottom: 10px;
 }
 
-.section > h2 {
-  margin: 0 0 13px;
-  color: var(--green-dark);
-  font-size: 21px;
+.hero p {
+  color: rgba(255,255,255,.85);
+  max-width: 650px;
 }
 
-.panel {
-  position: relative;
+#todayDate,
+#hijriQuick {
+  margin-top: 12px;
+  color: var(--gold-light);
+  font-weight: 700;
+}
+
+/* ================= FEATURE GRID ================= */
+
+.home-grid,
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+  margin: 22px 0;
+}
+
+.feature-card,
+.menu-grid button,
+.feature-tile {
+  min-width: 0;
+  padding: 20px 13px;
+  text-align: center;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  transition: transform .2s ease, border-color .2s ease;
+}
+
+.feature-card:hover,
+.menu-grid button:hover,
+.feature-tile:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold);
+}
+
+.feature-card .icon,
+.feature-card span,
+.menu-grid button span {
+  display: block;
+  font-size: 28px;
+  margin-bottom: 7px;
+}
+
+.feature-card h3,
+.menu-grid button {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* ================= CARDS ================= */
+
+.content-card,
+.card,
+.prayer-card,
+.quran-card,
+.dua-card,
+.hadith-card,
+.list-card {
+  padding: 20px;
   margin: 15px 0;
-  padding: 21px;
-  overflow: hidden;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: var(--surface);
   box-shadow: var(--shadow);
 }
 
-.panel h2,
-.panel h3,
-.panel h4 {
-  margin-top: 0;
-  color: var(--green-dark);
-}
-
-.panel p {
+.content-card p,
+.card p {
   color: var(--muted);
 }
 
 #nextPrayerName {
-  color: var(--green);
-  font-size: 23px;
+  color: var(--gold);
+  font-weight: 900;
 }
 
 #nextPrayerCountdown {
-  margin-bottom: 0;
+  font-size: clamp(25px, 5vw, 38px);
+  font-weight: 900;
+  color: var(--green-700);
+  font-variant-numeric: tabular-nums;
 }
 
-/* Feature tiles */
+/* ================= BUTTONS ================= */
 
-.tiles {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin: 22px 0;
+.primary-btn,
+button.primary-btn,
+#prayerBtn,
+#quranBtn,
+#ramadanBtn,
+#zakatBtn,
+#saveProfileBtn,
+#quizStartBtn,
+#quizNextBtn,
+#saveAzanPrefs {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 20px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--green-700), var(--green-900));
+  font-weight: 800;
+  box-shadow: 0 5px 15px rgba(8, 118, 83, .18);
+  transition: transform .2s ease, opacity .2s ease;
 }
 
-.tiles button {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 9px;
-  min-height: 112px;
-  padding: 17px 15px;
-  overflow: hidden;
+.primary-btn:hover,
+#prayerBtn:hover,
+#quranBtn:hover,
+#ramadanBtn:hover,
+#zakatBtn:hover,
+#saveProfileBtn:hover {
+  transform: translateY(-2px);
+  opacity: .92;
+}
+
+.secondary-btn,
+#resetBtn {
   border: 1px solid var(--border);
-  border-radius: 18px;
-  background: var(--surface);
-  color: var(--green-dark);
-  box-shadow: var(--shadow);
-  font-size: 27px;
-  text-align: left;
-}
-
-.tiles button:nth-child(4n + 1) {
-  background: linear-gradient(140deg, var(--surface), var(--green-light));
-}
-
-.tiles button:nth-child(4n + 2) {
-  background: linear-gradient(140deg, var(--surface), #f9f0d9);
-}
-
-.tiles button:nth-child(4n + 3) {
-  background: linear-gradient(140deg, var(--surface), #eaf0fa);
-}
-
-.tiles button:nth-child(4n + 4) {
-  background: linear-gradient(140deg, var(--surface), #f6eaf0);
-}
-
-.tiles button::after {
-  position: absolute;
-  right: -13px;
-  bottom: -24px;
-  width: 65px;
-  height: 65px;
-  border: 1px solid rgba(8,118,83,.12);
-  border-radius: 50%;
-  content: "";
-}
-
-.tiles button b {
+  border-radius: 12px;
+  padding: 11px 17px;
+  background: var(--surface-2);
   color: var(--text);
-  font-size: 14px;
-  font-weight: 750;
+  font-weight: 700;
 }
 
-.tiles button:hover {
-  border-color: var(--gold);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 25px rgba(5,67,44,.12);
-}
+/* ================= FORMS ================= */
 
-/* Forms */
-
-input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+input,
 select,
 textarea {
   width: 100%;
-  min-height: 46px;
-  padding: 10px 13px;
+  padding: 12px 14px;
+  margin: 7px 0 13px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  outline: none;
   background: var(--surface);
   color: var(--text);
-  transition: border .2s, box-shadow .2s;
+  outline: none;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: var(--green);
-  box-shadow: 0 0 0 3px rgba(8,118,83,.10);
-}
-
-input::placeholder {
-  color: var(--muted);
-  opacity: .8;
+  border-color: var(--green-600);
+  box-shadow: 0 0 0 3px rgba(16, 150, 106, .1);
 }
 
 label {
   display: block;
-  margin: 13px 0 7px;
+  margin: 8px 0 4px;
   color: var(--text);
-  font-size: 14px;
-  font-weight: 650;
-}
-
-.row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 12px 0;
-}
-
-.row input {
-  flex: 1;
-  min-width: 0;
-}
-
-.row button {
-  flex-shrink: 0;
-}
-
-.checks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin: 14px 0;
-}
-
-.checks label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-  padding: 9px 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface-2);
+  font-weight: 700;
 }
 
 input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--green);
+  width: auto;
+  margin-right: 8px;
+  accent-color: var(--green-700);
 }
 
-/* Buttons */
-
-button:not(.brand):not(.tiles button):not(#darkModeBtn):not(#closeCreatorBtn) {
-  border-radius: 12px;
-}
-
-#prayerBtn,
-#quranBtn,
-#saveAzanPrefs,
-#azanNotifyBtn,
-#playSurahBtn,
-#hijriBtnFull,
-#ramadanBtn,
-#qiblaBtn,
-#tasbihBtn,
-#resetBtn,
-#zakatBtn,
-#quizStartBtn,
-#quizNextBtn,
-#mosqueBtn,
-#saveProfileBtn,
-#signInBtn,
-#signUpBtn,
-#creatorBtn {
-  min-height: 43px;
-  margin: 6px 4px 6px 0;
-  padding: 10px 16px;
-  border: 1px solid transparent;
-  background: linear-gradient(135deg, var(--green), var(--green-dark));
-  color: white;
-  font-weight: 750;
-  box-shadow: 0 5px 13px rgba(5,67,44,.13);
-}
-
-#resetBtn {
-  border-color: var(--border);
-  background: var(--surface-2);
-  color: var(--green);
-  box-shadow: none;
-}
-
-#creatorBtn {
-  background: linear-gradient(135deg, #b99142, #dfbd69);
-  color: #26351f;
-}
-
-/* Content and information cards */
+/* ================= PRAYER TIMES ================= */
 
 #prayerCards,
+.prayer-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+
+#prayerCards > *,
+.prayer-list > * {
+  padding: 15px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+#prayerInfo,
+#ramadanInfo,
+#hijriInfo,
+#zakatInfo,
+#quranInfo {
+  margin-top: 15px;
+  color: var(--muted);
+}
+
+/* ================= QURAN ================= */
+
+#quranAudio {
+  width: 100%;
+  margin: 15px 0;
+}
+
+.quran-content,
+#bookmarkList,
+#bookmarkListSaved {
+  margin-top: 15px;
+}
+
+.ayah,
+.ayah-card {
+  padding: 18px;
+  margin: 12px 0;
+  border-radius: 15px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.arabic,
+.ayah-arabic {
+  font-family: "Noto Naskh Arabic", "Amiri", serif;
+  font-size: 27px;
+  line-height: 2;
+  direction: rtl;
+  text-align: right;
+  color: var(--green-800);
+}
+
+.translation,
+.ayah-translation {
+  margin-top: 10px;
+  color: var(--muted);
+  line-height: 1.9;
+}
+
+/* ================= DUA & HADITH ================= */
+
 #duaList,
 #hadithInfo,
 #historyList,
 #prophetList,
 #companionList,
-#hijriInfo,
-#ramadanInfo,
-#savedList,
-#bookmarkList,
-#bookmarkListSaved,
-#dailySummary {
-  margin-top: 16px;
+#savedList {
+  display: grid;
+  gap: 13px;
+  margin-top: 15px;
 }
 
-#prayerCards > *,
 #duaList > *,
 #hadithInfo > *,
 #historyList > *,
 #prophetList > *,
 #companionList > *,
-#hijriInfo > *,
-#ramadanInfo > *,
-#savedList > *,
-#bookmarkList > *,
-#bookmarkListSaved > *,
-#dailySummary > * {
-  margin-bottom: 12px;
-}
-
-.content-card,
-.result-card,
-.result-box,
-#prayerCards > div,
-#duaList > div,
-#hadithInfo > div,
-#historyList > div,
-#prophetList > div,
-#companionList > div {
-  padding: 17px;
+#savedList > * {
+  padding: 18px;
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  background: var(--surface);
-  box-shadow: 0 5px 16px rgba(5,67,44,.045);
-}
-
-.content-card h3,
-.content-card h4,
-.result-box h3,
-.result-box h4 {
-  margin-top: 0;
-  color: var(--green);
-}
-
-.notice {
-  padding: 13px 15px;
   border-left: 4px solid var(--gold);
-  border-radius: 9px;
-  background: var(--gold-light);
-  color: #6d5727;
-  font-size: 13px;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
 }
 
-#prayerInfo,
-#profileMessage,
-#authStatus,
-#firebasePushStatus,
-#zakatInfo,
-#quizFeedback {
-  color: var(--muted);
-  overflow-wrap: anywhere;
-}
-
-/* Arabic text */
-
-.arabic-text,
-.arabic {
-  color: var(--green);
-  font-family: "Noto Naskh Arabic", "Amiri", serif;
-  font-size: 26px;
-  line-height: 2.1;
-  text-align: right;
-  direction: rtl;
-}
-
-/* Quran audio */
-
-audio {
-  width: 100%;
-  margin: 12px 0;
-  border-radius: 12px;
-}
-
-/* Tasbih */
-
-#tasbihCount {
-  display: grid;
-  place-items: center;
-  width: 170px;
-  height: 170px;
-  margin: 25px auto;
-  border: 9px solid var(--gold);
-  border-radius: 50%;
-  background: var(--surface);
-  color: var(--green);
-  box-shadow: 0 0 0 9px var(--green-light), var(--shadow);
-  font-size: 48px;
-  font-weight: 850;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Qibla compass */
+/* ================= QIBLA COMPASS ================= */
 
 #compass {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: min(72vw, 270px);
-  height: min(72vw, 270px);
+  width: min(270px, 75vw);
+  aspect-ratio: 1;
   margin: 25px auto;
-  border: 9px solid var(--gold);
+  border: 10px solid var(--green-800);
   border-radius: 50%;
   background:
-    radial-gradient(circle, var(--surface) 0 53%, var(--green-light) 54% 100%);
-  color: var(--green);
-  box-shadow: 0 0 0 7px var(--green-light), var(--shadow);
-  font-size: 38px;
+    radial-gradient(circle, var(--surface) 50%, var(--green-100) 100%);
+  box-shadow: 0 10px 30px rgba(0,0,0,.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
-#compassNeedle {
+#compassNeedle,
+.compass-needle {
+  width: 5px;
+  height: 42%;
   position: absolute;
-  top: 15%;
-  left: 50%;
-  color: #c33d37;
-  font-size: 45px;
-  transform: translateX(-50%);
-  transform-origin: center 100%;
+  top: 8%;
+  left: calc(50% - 2.5px);
+  transform-origin: 50% 100%;
+  border-radius: 5px;
+  background: linear-gradient(to bottom, #d13c3c 50%, #aaa 50%);
 }
 
 #qiblaDegree {
-  color: var(--green);
   text-align: center;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--green-800);
 }
 
-/* Daily amal */
+/* ================= TASBIH ================= */
 
-.bar {
-  height: 11px;
-  margin: 12px 0;
+#tasbihCount {
+  font-size: clamp(48px, 10vw, 76px);
+  font-weight: 900;
+  text-align: center;
+  color: var(--green-800);
+  font-variant-numeric: tabular-nums;
+  margin: 25px 0;
+}
+
+#tasbihBtn {
+  width: min(220px, 65vw);
+  aspect-ratio: 1;
+  display: block;
+  margin: 20px auto;
+  border: 8px solid var(--gold);
+  border-radius: 50%;
+  color: white;
+  background: linear-gradient(145deg, var(--green-600), var(--green-950));
+  font-size: 22px;
+  font-weight: 900;
+  box-shadow: 0 12px 30px rgba(6, 45, 37, .25);
+  transition: transform .15s ease;
+}
+
+#tasbihBtn:active {
+  transform: scale(.95);
+}
+
+/* ================= AMAL PROGRESS ================= */
+
+#amalProgress {
+  color: var(--green-700);
+  font-weight: 900;
+}
+
+.progress-track {
+  height: 12px;
+  width: 100%;
   overflow: hidden;
-  border-radius: 20px;
-  background: var(--border);
+  background: var(--surface-2);
+  border-radius: 30px;
+  margin: 12px 0;
 }
 
-#amalProgressBar {
-  width: 0;
+#amalProgressBar,
+.progress-bar {
   height: 100%;
+  width: 0;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--green), var(--gold));
+  background: linear-gradient(90deg, var(--green-600), var(--gold));
   transition: width .3s ease;
 }
 
-.amal-check {
-  width: 19px;
-  height: 19px;
-  margin-right: 8px;
-  accent-color: var(--green);
-}
+/* ================= QUIZ ================= */
 
-/* Quiz */
-
-#quizOptions {
-  display: grid;
-  gap: 9px;
+#quizQuestion {
+  font-size: 20px;
+  font-weight: 800;
   margin: 15px 0;
 }
 
-#quizOptions button {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  text-align: left;
+#quizOptions {
+  display: grid;
+  gap: 10px;
 }
 
-/* Creator modal */
+#quizOptions button {
+  text-align: left;
+  padding: 13px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  background: var(--surface);
+}
 
-#creatorModal {
+#quizOptions button:hover {
+  border-color: var(--gold);
+  background: var(--surface-2);
+}
+
+#quizFeedback {
+  margin: 12px 0;
+  font-weight: 800;
+}
+
+/* ================= PROFILE ================= */
+
+#profileName,
+#profileCity,
+#authEmail,
+#authPassword {
+  display: block;
+}
+
+#authStatus,
+#profileMessage,
+#dailySummary {
+  margin: 12px 0;
+  color: var(--muted);
+}
+
+/* ================= CREATOR PROFILE ================= */
+
+.creator-profile {
+  text-align: center;
+  padding: 25px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  margin: 20px 0;
+}
+
+.creator-photo {
+  width: 125px;
+  height: 125px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+  border: 4px solid var(--gold);
+  box-shadow: 0 5px 20px rgba(0,0,0,.12);
+}
+
+.creator-mini {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.creator-mini img {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--gold);
+}
+
+/* ================= CREATOR MODAL ================= */
+
+.modal {
+  display: none;
   position: fixed;
   inset: 0;
   z-index: 1000;
-  display: none;
+  padding: 20px;
+  background: rgba(0, 0, 0, .68);
   align-items: center;
   justify-content: center;
-  padding: 18px;
-  background: rgba(0,20,14,.76);
-  backdrop-filter: blur(6px);
 }
 
-#creatorModal.open,
-#creatorModal.show {
+.modal.open {
   display: flex;
 }
 
-#creatorModal > div {
+.modal-content {
   position: relative;
-  width: min(100%, 410px);
+  width: min(420px, 100%);
   max-height: 90vh;
   overflow-y: auto;
-  padding: 30px 22px;
-  border: 1px solid var(--gold);
-  border-radius: 25px;
+  padding: 28px;
+  text-align: center;
+  border-radius: 22px;
   background: var(--surface);
   color: var(--text);
-  box-shadow: 0 25px 80px rgba(0,0,0,.3);
-  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
 }
 
 #closeCreatorBtn {
   position: absolute;
   top: 10px;
-  right: 12px;
-  width: 37px;
-  height: 37px;
-  border: 0;
+  right: 13px;
+  border: none;
   border-radius: 50%;
+  width: 35px;
+  height: 35px;
   background: var(--surface-2);
   color: var(--text);
-  font-size: 25px;
+  font-size: 20px;
 }
 
-#creatorModal img {
-  width: 130px;
-  height: 130px;
-  margin: 15px auto;
-  border: 4px solid var(--gold);
-  border-radius: 50%;
-  object-fit: cover;
-}
+/* ================= BOTTOM NAVIGATION ================= */
 
-#creatorModal h2 {
-  margin: 10px 0 5px;
-  color: var(--green);
-  font-size: 24px;
-}
-
-#creatorModal p {
-  color: var(--muted);
-}
-
-/* Bottom navigation */
-
-nav {
+.bottom-nav {
   position: fixed;
-  z-index: 100;
+  z-index: 200;
+  left: 0;
   right: 0;
   bottom: 0;
-  left: 0;
+  min-height: var(--nav-height);
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
   display: flex;
-  justify-content: space-around;
-  gap: 4px;
-  padding: 8px 7px calc(8px + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--border);
-  background: rgba(255,255,255,.96);
-  box-shadow: 0 -5px 20px rgba(0,0,0,.055);
-  backdrop-filter: blur(14px);
-}
-
-nav button {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  gap: 1px;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -5px 20px rgba(0,0,0,.06);
+}
+
+.bottom-nav button {
+  flex: 1;
+  max-width: 150px;
   min-width: 0;
-  min-height: 51px;
-  padding: 4px 2px;
-  border: 0;
-  background: transparent;
+  border: none;
+  border-radius: 12px;
+  padding: 9px 5px;
   color: var(--muted);
-  font-size: 21px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 800;
 }
 
-nav button small {
-  font-size: 11px;
-  font-weight: 650;
+.bottom-nav button.active,
+.bottom-nav button[aria-current="page"] {
+  color: white;
+  background: var(--green-800);
 }
 
-nav button.active,
-nav button:focus {
-  color: var(--green);
+/* ================= LINKS & UTILITIES ================= */
+
+a {
+  color: var(--green-700);
+  text-decoration: none;
 }
 
-/* Dark mode */
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 18px 0;
+}
+
+small {
+  color: var(--muted);
+}
+
+.empty-state {
+  padding: 25px;
+  text-align: center;
+  color: var(--muted);
+}
+
+button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+/* ================= DARK MODE ================= */
 
 body.dark {
-  --green: #63d3a0;
-  --green-dark: #a1e5c2;
-  --green-deep: #071d16;
-  --green-light: #1b3c30;
-  --gold: #e5c477;
-  --gold-light: #453b25;
-  --bg: #0d1712;
-  --surface: #17251e;
-  --surface-2: #20342a;
-  --text: #edf6ef;
-  --muted: #a9bcb0;
-  --border: #30483a;
-  --shadow: 0 8px 25px rgba(0,0,0,.23);
+  --bg: #0b1713;
+  --surface: #14251e;
+  --surface-2: #1c3329;
+  --text: #e5f0e9;
+  --muted: #a4b7aa;
+  --border: #294337;
+  --green-100: #1b392c;
+  --shadow: 0 8px 28px rgba(0,0,0,.18);
 }
 
-body.dark {
-  background-color: var(--bg);
-  background-image:
-    radial-gradient(circle at 10% 15%, rgba(229,196,119,.06) 1px, transparent 2px),
-    repeating-linear-gradient(45deg, transparent 0 35px, rgba(99,211,160,.025) 36px 37px);
-}
-
-body.dark header {
-  background: rgba(19,35,27,.96);
-}
-
-body.dark header .brand {
-  color: var(--green-dark);
+body.dark .screen h2,
+body.dark .arabic,
+body.dark .ayah-arabic,
+body.dark #tasbihCount,
+body.dark #qiblaDegree {
+  color: #75d4a6;
 }
 
 body.dark .hero {
   background:
-    radial-gradient(circle at 85% 25%, rgba(229,196,119,.15), transparent 25%),
-    linear-gradient(130deg, #06281e, #0b4934 65%, #123c2e);
-}
-
-body.dark .screen > h1,
-body.dark .section > h2,
-body.dark .panel h2,
-body.dark .panel h3 {
-  color: var(--green-dark);
-}
-
-body.dark .tiles button {
-  border-color: var(--border);
-  color: var(--green);
-  box-shadow: var(--shadow);
-}
-
-body.dark .tiles button:nth-child(4n + 1) {
-  background: linear-gradient(140deg, #172b22, #1d4030);
-}
-
-body.dark .tiles button:nth-child(4n + 2) {
-  background: linear-gradient(140deg, #28291e, #3b3524);
-}
-
-body.dark .tiles button:nth-child(4n + 3) {
-  background: linear-gradient(140deg, #1b2830, #253a42);
-}
-
-body.dark .tiles button:nth-child(4n + 4) {
-  background: linear-gradient(140deg, #2b2029, #3b2b36);
-}
-
-body.dark .tiles button b {
-  color: var(--text);
-}
-
-body.dark .notice {
-  color: #f2d99c;
-  background: #403820;
-  border-left-color: var(--gold);
-}
-
-body.dark .arabic-text,
-body.dark .arabic {
-  color: #b5ebce;
-}
-
-body.dark #tasbihCount {
-  background: #17251e;
-  color: #a1e5c2;
-  box-shadow: 0 0 0 9px #1b3c30, var(--shadow);
+    radial-gradient(circle at 85% 15%, rgba(243,217,148,.12), transparent 25%),
+    linear-gradient(125deg, #041e18, #07533d 65%, #0a3c30);
 }
 
 body.dark #compass {
-  background: radial-gradient(circle, #17251e 0 53%, #1b3c30 54% 100%);
+  background: radial-gradient(circle, #172b21 50%, #1b392c 100%);
 }
 
-body.dark nav {
-  background: rgba(19,35,27,.97);
+body.dark .bottom-nav {
+  box-shadow: 0 -5px 20px rgba(0,0,0,.25);
 }
 
-body.dark nav button {
-  color: #a9bcb0;
-}
+/* ================= TABLET ================= */
 
-body.dark nav button.active,
-body.dark nav button:focus {
-  color: #63d3a0;
-}
-
-body.dark #darkModeBtn {
-  background: #20342a;
-  color: #e5c477;
-}
-
-body.dark #creatorModal > div {
-  background: #17251e;
-}
-
-body.dark #creatorModal h2 {
-  color: #a1e5c2;
-}
-
-body.dark #resetBtn {
-  color: #a1e5c2;
-  background: #20342a;
-}
-
-body.dark #quizOptions button {
-  background: var(--surface);
-  color: var(--text);
-}
-
-body.dark #creatorBtn {
-  color: #302613;
-}
-
-/* Tablet and desktop */
-
-@media (min-width: 900px) {
-  main {
-    margin-top: 35px;
+@media (max-width: 900px) {
+  .app-main {
+    width: 94%;
   }
 
-  .hero {
-    min-height: 320px;
+  .home-grid,
+  .menu-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .tiles {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 17px;
-  }
-
-  .tiles button {
-    min-height: 135px;
-    padding: 21px;
-  }
-
-  .panel {
-    padding: 28px;
+  #prayerCards,
+  .prayer-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-/* Mobile */
+/* ================= MOBILE ================= */
 
 @media (max-width: 600px) {
+  :root {
+    --header-height: 60px;
+    --nav-height: 65px;
+  }
+
   body {
-    padding-bottom: 88px;
+    font-size: 14px;
   }
 
-  header {
-    min-height: 64px;
-    padding: 8px 12px;
+  .app-header {
+    padding: 9px 4%;
+    gap: 8px;
   }
 
-  header .brand {
-    font-size: 20px;
+  .brand,
+  .app-header [data-screen="home"] {
+    font-size: 17px;
   }
 
-  header .brand span {
-    font-size: 15px;
+  .app-header select,
+  #languageSelect {
+    max-width: 95px;
+    padding: 7px 6px;
+    font-size: 12px;
   }
 
-  main {
-    width: calc(100% - 22px);
-    margin-top: 15px;
+  #darkModeBtn {
+    padding: 7px 9px;
+    font-size: 13px;
+  }
+
+  .app-main {
+    width: 92%;
+    margin: 17px auto 95px;
   }
 
   .hero {
-    min-height: 235px;
-    padding: 23px 19px;
-    border-radius: 22px;
+    padding: 28px 21px;
+    border-radius: 20px;
   }
 
   .hero h1 {
-    font-size: 29px;
+    font-size: 27px;
   }
 
-  .tiles {
+  .hero::after {
+    right: 3%;
+    top: 15px;
+    font-size: 100px;
+  }
+
+  .screen h2 {
+    font-size: 21px;
+  }
+
+  .home-grid,
+  .menu-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
 
-  .tiles button {
-    min-height: 105px;
-    padding: 13px;
-    font-size: 24px;
+  .feature-card,
+  .menu-grid button,
+  .feature-tile {
+    padding: 15px 9px;
+    border-radius: 15px;
   }
 
-  .tiles button b {
-    font-size: 13px;
-  }
-
-  .panel {
-    padding: 16px;
-    border-radius: 17px;
-  }
-
-  .row {
-    flex-wrap: wrap;
-  }
-
-  .row button {
-    width: 100%;
-  }
-
-  #creatorModal > div {
-    padding: 27px 17px;
-  }
-
-  nav button {
-    font-size: 20px;
-  }
-}
-
-@media (max-width: 360px) {
-  header .brand span {
-    font-size: 13px;
-  }
-
-  header select {
-    max-width: 92px;
-    font-size: 12px;
-  }
-
-  .hero h1 {
+  .feature-card .icon,
+  .feature-card span,
+  .menu-grid button span {
     font-size: 25px;
   }
 
-  .tiles button {
-    min-height: 98px;
-    padding: 11px;
+  .content-card,
+  .card,
+  .prayer-card,
+  .quran-card,
+  .dua-card,
+  .hadith-card,
+  .list-card {
+    padding: 15px;
+    margin: 12px 0;
   }
 
-  nav button small {
-    font-size: 10px;
+  #prayerCards,
+  .prayer-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  #prayerCards > *,
+  .prayer-list > * {
+    padding: 12px 7px;
+  }
+
+  .bottom-nav {
+    gap: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  .bottom-nav button {
+    padding: 8px 2px;
+    font-size: 11px;
+  }
+
+  .arabic,
+  .ayah-arabic {
+    font-size: 24px;
+  }
+
+  .creator-photo {
+    width: 105px;
+    height: 105px;
+  }
+
+  .modal-content {
+    padding: 25px 18px;
   }
 }
+
+/* ================= SMALL PHONES ================= */
+
+@media (max-width: 360px) {
+  .app-main {
+    width: 94%;
+  }
+
+  .brand,
+  .app-header [data-screen="home"] {
+    font-size: 15px;
+  }
+
+  .home-grid,
+  .menu-grid {
+    gap: 8px;
+  }
+
+  .feature-card,
+  .menu-grid button {
+    padding: 12px 6px;
+    font-size: 12px;
+  }
+
+  .bottom-nav button {
+    font-size: 10px;
+  }
+
+  .hero {
+    padding: 23px 16px;
+  }
+
+  .hero h1 {
+    font-size: 23px;
+  }
+}
+
+/* ================= DESKTOP ================= */
+
+@media (min-width: 901px) {
+  .app-main {
+    margin-top: 35px;
+  }
+
+  .hero {
+    padding: 55px 48px;
+  }
+
+  .content-card {
+    padding: 26px;
+  }
+
+  .bottom-nav {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    bottom: 18px;
+    width: min(600px, 90%);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    min-height: 65px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.12);
+  }
+}
+
+/* ================= ACCESSIBILITY ================= */
 
 @media (prefers-reduced-motion: reduce) {
   *,
