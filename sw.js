@@ -3,12 +3,13 @@
 // Firebase Messaging shares this existing PWA worker so the app's offline cache worker
 // is not replaced by a second service worker with the same root scope.
 const FIREBASE_WEB_CONFIG = {
-  apiKey: "PASTE_FIREBASE_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "PASTE_MESSAGING_SENDER_ID",
-  appId: "PASTE_FIREBASE_APP_ID"
+  apiKey: "AIzaSyALSfBXa-4LAhDSyPbB0CixO5rZwzUboBc",
+  authDomain: "islamic-life-d6bdc.firebaseapp.com",
+  projectId: "islamic-life-d6bdc",
+  storageBucket: "islamic-life-d6bdc.firebasestorage.app",
+  messagingSenderId: "76264945564",
+  appId: "1:76264945564:web:2bcfdf478a1a1f07177a59"
+};
 };
 const FIREBASE_PUSH_READY = Object.values(FIREBASE_WEB_CONFIG).every(v => typeof v === "string" && !v.startsWith("PASTE_") && !v.includes("YOUR_PROJECT_ID"));
 if (FIREBASE_PUSH_READY) {
