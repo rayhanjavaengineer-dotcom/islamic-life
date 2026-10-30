@@ -1,0 +1,31 @@
+ISLAMIC LIFE — PROJECT STATUS
+================================
+
+প্রজেক্ট: Islamic Life
+Creator: Rayhan Imtiaz
+উদ্দেশ্য: বাংলা ও ইংরেজি ভাষার ইসলামিক লাইফস্টাইল ওয়েব অ্যাপ / ইনস্টলযোগ্য PWA।
+
+এই প্যাকেজে থাকা ফাইল:
+- README-BN.txt
+- PROJECT-STATUS-BN.txt
+- creator-photo-note.txt
+- public/index.html
+- public/style.css
+- public/app.js
+- public/manifest.json
+- public/sw.js
+- public/firebase-config.js
+- public/firebase-push.js
+- public/creator.jpg
+- public/icon-192.png
+- public/icon-512.png
+
+যাচাই ও সীমাবদ্ধতা:
+- প্রয়োজনীয় ফাইলগুলো নির্ধারিত public/ ফোল্ডার কাঠামোয় রাখা হয়েছে।
+- icon-192.png তৈরি করা হয়েছে 192 × 192 পিক্সেলে।
+- icon-512.png রাখা হয়েছে 512 × 512 পিক্সেলে।
+- ফাইল প্যাকেজিং ও কিছু স্থির (static) পরীক্ষা করা হয়েছে; লাইভ ওয়েবসাইটে সব ফিচার কাজ করছে—এমন নিশ্চয়তা নয়।
+- Firebase, Push Notification, বাহ্যিক API, নামাজের সময়ের নির্ভুলতা এবং নেটওয়ার্কনির্ভর ফিচারগুলো সঠিক লাইভ কনফিগারেশন দিয়ে আলাদাভাবে পরীক্ষা করতে হবে।
+- Firebase-এর private service-account key বা server secret কখনো frontend ফাইলে প্রকাশ করবে না।
+
+এই ফাইলটি শুধু প্রজেক্টের অবস্থা ও নির্দেশনা জানায়; এটি নিজে কোনো ফিচার চালু করে না।
